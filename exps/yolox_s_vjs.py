@@ -60,6 +60,7 @@ class Exp(MyExp):
         
         self.eval_interval = 15
         self.exp_name = os.path.split(os.path.realpath(__file__))[1].split(".")[0]
+        # self.exp_name = "yolox_s_vjs_fp16"
 
         # -----------------  testing config ------------------ #
         self.test_size = (640, 640)

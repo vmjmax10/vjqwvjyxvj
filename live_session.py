@@ -1,5 +1,10 @@
 # Standrad lib imports
 import argparse
+import time
+
+
+
+
 
 def make_parser():
     parser = argparse.ArgumentParser("LIVE SESSION RUN SETTINGS")
@@ -25,34 +30,59 @@ def make_parser():
         type=int, 
         help="Wheter to perform liveness test after lost tracking in a session"
     )
-
+    parser.add_argument(
+        "--face_db_path", 
+        default="face_db", 
+        type=str, 
+        help="Load pre face images of the live session persons"
+    )
     return parser
 
 
-def main(exp, args):
-    if exp.seed is not None:
-        random.seed(exp.seed)
-        torch.manual_seed(exp.seed)
-        cudnn.deterministic = True
-        warnings.warn(
-            "You have chosen to seed training. This will turn on the CUDNN deterministic setting, "
-            "which can slow down your training considerably! You may see unexpected behavior "
-            "when restarting from checkpoints."
-        )
+class FaceRecognition(object):
 
-    # set environment variables for distributed training
-    configure_nccl()
-    configure_omp()
-    cudnn.benchmark = True
+    def __init__(self, face_db_path, face_db_blobs=None) -> None:
+        super().__init__()
 
-    trainer = Trainer(exp, args)
-    trainer.train()
+        self.load_face_recognition_model()
+        self.compute_face_db_embeddings()
+
+    def load_face_recognition_model():
+        pass
+
+
+        
+
+
+
+
+
+
+
+
+
+
+def main(args):
+
+    """
+        args: Either a dictionary or argument parsed args
+    """
+    if not isinstance(args, dict):
+        args = vars(args)
+    
+    assert isinstance(args, dict), "Argument must be of type dict"
+    
+
+
+
+
+
+
+
 
 
 if __name__ == "__main__":
     args = make_parser().parse_args()
-   
-
-
-
-    
+    print("Live session begin at time => ", time.time())
+    main(args)
+    print("Live session end at time => ", time.time())

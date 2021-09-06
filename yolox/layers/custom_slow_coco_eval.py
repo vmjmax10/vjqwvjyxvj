@@ -509,7 +509,7 @@ class CustomCOCOeval:
             summarize = _summarizeKps
         self.stats = summarize()
 
-        print("::::: Per class AP 0:95 ::::")
+        print("\n::::: Per class AP 0:95 ::::")
         ap_txt = ""
         for c_id in range(0, self.num_classes):
             if c_id % 8 == 0:
