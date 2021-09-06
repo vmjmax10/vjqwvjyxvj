@@ -21,11 +21,12 @@ class Exp(MyExp):
         self.input_size = (640, 640)  # (height, width)
         self.multiscale_range = 0
         # self.random_size = (14, 26)
-        self.data_dir = "/content/YOLOX/gdrive/MyDrive/DATASET/VIDEO_ANALYSIS_JS/pre_final"
+        self.data_dir = "/content/vjqwvjyxvj/gdrive/MyDrive/DATASET/VIDEO_ANALYSIS_JS/pre_final"
         self.train_ann = "annotations/instances_train2017.json"
         self.val_ann = "annotations/instances_val2017.json"
         self.train_img_dir = "train2017"
         self.val_img_dir = "val2017"
+        self.output_dir = "/content/vjqwvjyxvj/gdrive/MyDrive/TRAINED_MODELS/VIDEO_ANALYSIS_JS"
         
         # --------------- transform config ----------------- #
         self.mosaic_prob = 1.0
