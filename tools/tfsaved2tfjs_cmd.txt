@@ -1,0 +1,22 @@
+## YOLOX_S
+
+1.FP8
+tensorflowjs_converter --input_format=tf_saved_model --signature_name "serving_default" --output_format tfjs_graph_model  --saved_model_tags=serve --quantization_bytes 1 "models/yolox_s_vjs_tf" "models/yolox_s_vjs_fp8" 
+
+2.FP16
+tensorflowjs_converter --input_format=tf_saved_model --signature_name "serving_default" --output_format tfjs_graph_model  --saved_model_tags=serve --quantization_bytes 2 "models/yolox_s_vjs_tf" "models/yolox_s_vjs_fp16" 
+
+3.FP32
+tensorflowjs_converter --input_format=tf_saved_model --signature_name "serving_default" --output_format tfjs_graph_model  --saved_model_tags=serve "models/yolox_s_vjs_tf" "models/yolox_s_vjs_fp32" 
+
+
+## YOLOX_NANO
+
+1.FP8
+tensorflowjs_converter --input_format=tf_saved_model --signature_name "serving_default" --output_format tfjs_graph_model  --saved_model_tags=serve --quantization_bytes 1 "models/yolox_nano_vjs_tf" "models/yolox_nano_vjs_fp8" 
+
+2.FP16
+tensorflowjs_converter --input_format=tf_saved_model --signature_name "serving_default" --output_format tfjs_graph_model  --saved_model_tags=serve --quantization_bytes 2 "models/yolox_nano_vjs_tf" "models/yolox_nano_vjs_fp16" 
+
+3.FP32
+tensorflowjs_converter --input_format=tf_saved_model --signature_name "serving_default" --output_format tfjs_graph_model  --saved_model_tags=serve "models/yolox_nano_vjs_tf" "models/yolox_nano_vjs_fp32" 
