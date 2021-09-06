@@ -41,7 +41,7 @@ class MosaicDetection(Dataset):
         self, dataset, img_size, mosaic=True, preproc=None,
         degrees=10.0, translate=0.1, mosaic_scale=(0.5, 1.5),
         mixup_scale=(0.5, 1.5), shear=2.0, perspective=0.0,
-        enable_mixup=True, mosaic_prob=1.0, mixup_prob=1.0, *args
+        enable_mixup=True, mosaic_prob=1.0, mixup_prob=1.0, flip=False, *args
     ):
         """
 
@@ -73,6 +73,7 @@ class MosaicDetection(Dataset):
         self.mosaic_prob = mosaic_prob
         self.mixup_prob = mixup_prob
         self.local_rank = get_local_rank()
+        self.flip = flip
 
     def __len__(self):
         return len(self._dataset)
@@ -160,7 +161,7 @@ class MosaicDetection(Dataset):
 
     def mixup(self, origin_img, origin_labels, input_dim):
         jit_factor = random.uniform(*self.mixup_scale)
-        FLIP = random.uniform(0, 1) > 0.5
+        FLIP = self.flip and random.uniform(0, 1) > 0.5
         cp_labels = []
         while len(cp_labels) == 0:
             cp_index = random.randint(0, self.__len__() - 1)

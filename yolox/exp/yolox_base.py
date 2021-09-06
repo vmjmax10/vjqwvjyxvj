@@ -32,8 +32,11 @@ class Exp(BaseExp):
         # You can uncomment this line to specify a multiscale range
         # self.random_size = (14, 26)
         self.data_dir = None
-        self.train_ann = "instances_train2017.json"
-        self.val_ann = "instances_val2017.json"
+        self.train_ann = "annotations/instances_train2017.json"
+        self.val_ann = "annotations/instances_val2017.json"
+        self.train_img_dir = "train2017"
+        self.val_img_dir = "val2017"
+
 
         # --------------- transform config ----------------- #
         self.mosaic_prob = 1.0
@@ -45,6 +48,9 @@ class Exp(BaseExp):
         self.shear = 2.0
         self.perspective = 0.0
         self.enable_mixup = True
+        self.max_labels_tt = 100
+        self.max_labels_mosaicd = 150
+        self.flip_image = False
 
         # --------------  training config --------------------- #
         self.warmup_epochs = 5
@@ -108,9 +114,13 @@ class Exp(BaseExp):
         with wait_for_the_master(local_rank):
             dataset = COCODataset(
                 data_dir=self.data_dir,
+                name=self.train_img_dir,
                 json_file=self.train_ann,
                 img_size=self.input_size,
-                preproc=TrainTransform(max_labels=50),
+                preproc=TrainTransform(
+                    max_labels=self.max_labels_tt,
+                    flip=self.flip_image
+                ),
                 cache=cache_img,
             )
 
@@ -118,7 +128,10 @@ class Exp(BaseExp):
             dataset,
             mosaic=not no_aug,
             img_size=self.input_size,
-            preproc=TrainTransform(max_labels=120),
+            preproc=TrainTransform(
+                max_labels=self.max_labels_mosaicd,
+                flip=self.flip_image
+            ),
             degrees=self.degrees,
             translate=self.translate,
             mosaic_scale=self.mosaic_scale,
@@ -128,6 +141,7 @@ class Exp(BaseExp):
             enable_mixup=self.enable_mixup,
             mosaic_prob=self.mosaic_prob,
             mixup_prob=self.mixup_prob,
+            flip=self.flip_image
         )
 
         self.dataset = dataset
@@ -228,15 +242,23 @@ class Exp(BaseExp):
         )
         return scheduler
 
-    def get_eval_loader(self, batch_size, is_distributed, testdev=False, legacy=False):
+    def get_eval_loader(
+        self, 
+        batch_size, 
+        is_distributed, 
+        testdev=False, 
+        legacy=False,
+        cache_img=False
+    ):
         from yolox.data import COCODataset, ValTransform
 
         valdataset = COCODataset(
             data_dir=self.data_dir,
-            json_file=self.val_ann if not testdev else "image_info_test-dev2017.json",
-            name="val2017" if not testdev else "test2017",
+            json_file=self.val_ann,
+            name=self.val_img_dir,
             img_size=self.test_size,
             preproc=ValTransform(legacy=legacy),
+            cache=cache_img
         )
 
         if is_distributed:
@@ -257,10 +279,25 @@ class Exp(BaseExp):
 
         return val_loader
 
-    def get_evaluator(self, batch_size, is_distributed, testdev=False, legacy=False):
+    def get_evaluator(
+        self, 
+        batch_size, 
+        is_distributed, 
+        testdev=False, 
+        legacy=False,
+        cache_img=False
+    ):
+        
         from yolox.evaluators import COCOEvaluator
 
-        val_loader = self.get_eval_loader(batch_size, is_distributed, testdev, legacy)
+        val_loader = self.get_eval_loader(
+            batch_size, 
+            is_distributed, 
+            testdev=testdev, 
+            legacy=legacy,
+            cache_img=cache_img
+        )
+        
         evaluator = COCOEvaluator(
             dataloader=val_loader,
             img_size=self.test_size,

@@ -140,7 +140,11 @@ def random_perspective(
     return img, targets
 
 
-def _mirror(image, boxes):
+def _mirror(image, boxes, flip=False):
+    
+    if not flip:
+        return image, boxes
+
     _, width, _ = image.shape
     if random.randrange(2):
         image = image[:, ::-1]
@@ -171,8 +175,9 @@ def preproc(img, input_size, swap=(2, 0, 1)):
 
 
 class TrainTransform:
-    def __init__(self, max_labels=50):
+    def __init__(self, max_labels=50, flip=False):
         self.max_labels = max_labels
+        self.flip = flip
 
     def __call__(self, image, targets, input_dim):
         boxes = targets[:, :4].copy()
@@ -191,7 +196,10 @@ class TrainTransform:
         boxes_o = xyxy2cxcywh(boxes_o)
 
         augment_hsv(image)
-        image_t, boxes = _mirror(image, boxes)
+
+        ## NO MIRRORING AS LFF -> RFF is there
+        image_t, boxes = _mirror(image, boxes, flip=self.flip)
+
         height, width, _ = image_t.shape
         image_t, r_ = preproc(image_t, input_dim)
         # boxes [xyxy] 2 [cx,cy,w,h]
