@@ -52,7 +52,7 @@ if __name__ == '__main__':
     cv2.namedWindow("disp", cv2.WINDOW_NORMAL)
 
     session = onnxruntime.InferenceSession(args.model)
-    
+    input_name = session.get_inputs()[0].name
 
     while 1:
         
@@ -67,7 +67,7 @@ if __name__ == '__main__':
             img, ratio = preprocess(origin_img, input_shape)
 
             img_t = img[None, :, :, :]
-            ort_inputs = {session.get_inputs()[0].name: img_t}
+            ort_inputs = {input_name: img_t}
             output = session.run(None, ort_inputs)
             pred = output[0] 
         
