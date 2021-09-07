@@ -13,7 +13,7 @@ import onnxruntime
 
 from yolox.data.data_augment import preproc as preprocess
 from yolox.data.datasets import COCO_CLASSES
-from yolox.utils import mkdir, multiclass_nms, demo_postprocess, vis, _pred
+from yolox.utils import mkdir, multiclass_nms, demo_postprocess, vis
 
 
 def make_parser():
