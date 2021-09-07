@@ -12,7 +12,7 @@ from yolox.exp import get_exp
 from yolox.models.network_blocks import SiLU
 from yolox.utils import replace_module
 
-MODEL_DIR = "models"
+MODEL_DIR = "all_models"
 
 
 def make_parser():
@@ -20,7 +20,7 @@ def make_parser():
     parser.add_argument(
         "--output_onnx_path", 
         type=str, 
-        default="models/yolox_s_vjs.onnx", 
+        default=f"{MODEL_DIR}/yolox_s_vjs.onnx", 
         help="output path of onnx model"
     )
     parser.add_argument(
@@ -42,11 +42,11 @@ def make_parser():
     )
     parser.add_argument("-expn", "--experiment-name", type=str, default=None)
     parser.add_argument("-n", "--name", type=str, default=None, help="model name")
-    parser.add_argument("-c", "--ckpt", default="models/yolox_s_vjs.pth", type=str, help="ckpt path")
+    parser.add_argument("-c", "--ckpt", default=f"{MODEL_DIR}/yolox_s_vjs.pth", type=str, help="ckpt path")
     parser.add_argument(
         "-size", 
         "--t_size", 
-        default=0, 
+        default=640, 
         type=int, 
         help="model input square size, if provided, test size willbe replaced"
     )
@@ -55,7 +55,7 @@ def make_parser():
     parser.add_argument(
         "--output_tf_saved_path", 
         type=str, 
-        default="models/yolox_s_vjs_tf", 
+        default=f"{MODEL_DIR}/yolox_s_vjs_tf", 
         help="output path of tf saved model"
     )
 
@@ -118,7 +118,7 @@ def main():
         from onnxsim import simplify
 
         # use onnxsimplify to reduce reduent model.
-        onnx_model = onnx.load(args.output_name)
+        onnx_model = onnx.load(args.output_onnx_path)
         model_simp, check = simplify(onnx_model)
         assert check, "Simplified ONNX model could not be validated"
         onnx.save(model_simp, args.output_onnx_path)
@@ -140,11 +140,14 @@ def main():
         print("-----")
         print(tf_rep.tensor_dict) # All nodes in the model
 
+        if not os.path.exists(args.output_tf_saved_path):
+            os.mkdir(args.output_tf_saved_path)
+
         tf_rep.export_graph(args.output_tf_saved_path)
         print("Converted model into tensorflow saved model", args.output_tf_saved_path)
         print("\n\n\n*****************DONE******************\n\n")
 
-        print("\ncross checking model")
+        print("\ncross checking tf model")
         import tensorflow as tf
         loaded = tf.saved_model.load(args.output_tf_saved_path)
         print(list(loaded.signatures.keys()))
@@ -158,8 +161,8 @@ if __name__ == "__main__":
 
 
 ## YOLOX_NANO
-# python tools/export2tfsaved.py -f exps/yolox_nano_vjs.py -c models/yolox_nano_vjs.pth --output_onnx_path models/yolox_nano_vjs.onnx --output_tf_saved_path models/yolox_nano_vjs_tf --t_size 768
+# python export2tfsaved.py  --tf_saved -f exps/yolox_nano_vjs.py -c all_models/yolox_nano_vjs.pth --output_onnx_path all_models/yolox_nano_vjs.onnx --output_tf_saved_path all_models/yolox_nano_vjs_tf --t_size 640
 
 
 ## YOLOX_S
-# python tools/export2tfsaved.py --tf_saved --t_size 640
+# python export2tfsaved.py --tf_saved --t_size 640
