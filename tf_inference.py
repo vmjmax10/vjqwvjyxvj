@@ -3,6 +3,7 @@
 # Copyright (c) Megvii, Inc. and its affiliates.
 
 import argparse
+from demo import MODEL_DIR
 import os
 import time
 
@@ -11,9 +12,11 @@ import numpy as np
 
 from yolox.data.data_augment import preproc as preprocess
 from yolox.data.datasets import COCO_CLASSES
-from yolox.utils import mkdir, multiclass_nms, demo_postprocess, vis, _pred
+from yolox.utils import mkdir, multiclass_nms, demo_postprocess, vis
 
 import tensorflow as tf
+
+MODEL_DIR = "all_models"
 
 def make_parser():
     parser = argparse.ArgumentParser("TF inference sample")
@@ -21,12 +24,12 @@ def make_parser():
         "-m",
         "--model",
         type=str,
-        default="models/yolox_s_vjs_tf",
+        default=f"{MODEL_DIR}/yolox_s_vjs_tf",
         help="Input your tf saved model path",
     )
     parser.add_argument(
         "--tsize", 
-        default=None, 
+        default=640, 
         type=int, 
         help="test img size, must be fixed",
     )
@@ -49,7 +52,9 @@ if __name__ == '__main__':
     loaded = tf.saved_model.load(args.model)
     print(list(loaded.signatures.keys()))
     infer = loaded.signatures["serving_default"]
-    print(infer.structured_outputs)
+    print(list(infer.structured_outputs.keys())[0])
+    output_node = str(list(infer.structured_outputs.keys())[0])
+
 
     while 1:
         
@@ -65,9 +70,9 @@ if __name__ == '__main__':
 
             img_t = img[None, :, :, :]
  
-            pred = infer(tf.convert_to_tensor(img_t, dtype=tf.float32))["output"].numpy()
+            pred = infer(tf.convert_to_tensor(img_t, dtype=tf.float32))[output_node].numpy()
 
-            predictions = demo_postprocess(pred, input_shape, p6=args.with_p6)[0]
+            predictions = demo_postprocess(pred, input_shape)[0]
 
             boxes = predictions[:, :4]
             scores = predictions[:, 4:5] * predictions[:, 5:]
@@ -103,6 +108,6 @@ if __name__ == '__main__':
         else:
             break
 
-# python demo/Tensorflow/tf_inference.py --tsize 640 --conf 0.50 --nms 0.6 -m models/yolox_s_vjs_tf
-# python demo/Tensorflow/tf_inference.py --tsize 640 --conf 0.50 --nms 0.6 -m models/yolox_nano_vjs_tf
+# python tf_inference.py --tsize 640 --conf 0.50 --nms 0.6 -m all_models/yolox_s_vjs_tf
+# python tf_inference.py --tsize 640 --conf 0.50 --nms 0.6 -m all_models/yolox_nano_vjs_tf
 

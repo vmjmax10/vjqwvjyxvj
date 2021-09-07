@@ -17,6 +17,7 @@ from yolox.exp import get_exp
 from yolox.utils import fuse_model, get_model_info, postprocess, vis
 
 IMAGE_EXT = [".jpg", ".jpeg", ".webp", ".bmp", ".png"]
+MODEL_DIR = "all_models"
 
 
 def make_parser():
@@ -41,20 +42,20 @@ def make_parser():
     parser.add_argument(
         "-f",
         "--exp_file",
-        default="exps/yolox_nano_vjs.py",
+        default="exps/yolox_s_vjs.py",
         type=str,
         help="pls input your expriment description file",
     )
-    parser.add_argument("-c", "--ckpt", default="models/yolox_nano_vjs.pth", type=str, help="ckpt for eval")
+    parser.add_argument("-c", "--ckpt", default=f"{MODEL_DIR}/yolox_s_vjs.pth", type=str, help="ckpt for eval")
     parser.add_argument(
         "--device",
         default="gpu",
         type=str,
         help="device to run our model, can either be cpu or gpu",
     )
-    parser.add_argument("--conf", default=0.3, type=float, help="test conf")
-    parser.add_argument("--nms", default=0.3, type=float, help="test nms threshold")
-    parser.add_argument("--tsize", default=None, type=int, help="test img size")
+    parser.add_argument("--conf", default=0.5, type=float, help="test conf")
+    parser.add_argument("--nms", default=0.65, type=float, help="test nms threshold")
+    parser.add_argument("--tsize", default=640, type=int, help="test img size")
     parser.add_argument(
         "--fp16",
         dest="fp16",
@@ -156,7 +157,7 @@ class Predictor(object):
             outputs = postprocess(
                 outputs, self.num_classes, self.confthre, self.nmsthre
             )
-            logger.info("Infer time: {:.4f}s".format(time.time() - t0))
+            # logger.info("Infer time: {:.4f}s".format(time.time() - t0))
         return outputs, img_info
 
     def visual(self, output, img_info, cls_conf=0.35):

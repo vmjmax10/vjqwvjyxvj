@@ -15,6 +15,8 @@ from yolox.data.data_augment import preproc as preprocess
 from yolox.data.datasets import COCO_CLASSES
 from yolox.utils import mkdir, multiclass_nms, demo_postprocess, vis
 
+MODEL_DIR = "all_models"
+
 
 def make_parser():
     parser = argparse.ArgumentParser("onnxruntime inference sample")
@@ -22,7 +24,7 @@ def make_parser():
         "-m",
         "--model",
         type=str,
-        default="models/yolox_s_vjs.onnx",
+        default=f"{MODEL_DIR}/yolox_s_vjs.onnx",
         help="Input your onnx model.",
     )
     parser.add_argument(
@@ -31,9 +33,9 @@ def make_parser():
         type=int, 
         help="test img size",
     )
-    parser.add_argument("--conf", default=0.65, type=float, help="test conf")
+    parser.add_argument("--conf", default=0.50, type=float, help="test conf")
     parser.add_argument("--camid", type=int, default=0, help="webcam demo camera id")
-    parser.add_argument("--nms", default=0.7, type=float, help="test nms threshold")
+    parser.add_argument("--nms", default=0.65, type=float, help="test nms threshold")
     parser.add_argument(
         "--with_p6",
         action="store_true",
@@ -108,7 +110,7 @@ if __name__ == '__main__':
         else:
             break
 
-# python demo/ONNXRuntime/onnx_inference.py --tsize 640 --conf 0.50 --nms 0.6 -m models/yolox_s_vjs.onnx
+# python onnx_inference.py --tsize 640 --conf 0.50 --nms 0.6 -m all_models/yolox_s_vjs.onnx
 
 """
 0.0    0.8796307444572449   [151.20025635   5.99160767 630.61602783 640.97021484]
