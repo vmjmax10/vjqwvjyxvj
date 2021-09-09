@@ -60,7 +60,7 @@ if __name__ == '__main__':
         
         ret_val, origin_img = cap.read()
 
-        # origin_img = cv2.imread("./js_inference/test.jpg")
+        # origin_img = cv2.imread("test.jpg")
 
         if ret_val:
 

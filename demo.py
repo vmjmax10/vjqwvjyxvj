@@ -317,6 +317,6 @@ if __name__ == "__main__":
     main(exp, args)
 
 
-## python demo.py webcam -f exps/yolox_nano_vjs.py -c all_models/yolox_nano_vjs.pth --conf 0.50 --nms 0.65 --tsize 640 --device gpu
+## python demo.py webcam -f exps/yolox_s_vjs.py -c all_models/yolox_s_vjs.pth --conf 0.50 --nms 0.65 --tsize 640 --device gpu
 
 # python demo.py webcam -f exps/yolox_nano_vjs.py -c all_models/yolox_nano_vjs.pth --conf 0.50 --nms 0.65 --tsize 640 --device cpu
