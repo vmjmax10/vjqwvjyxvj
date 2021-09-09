@@ -147,7 +147,7 @@ def main():
         print("Converted model into tensorflow saved model", args.output_tf_saved_path)
         print("\n\n\n*****************DONE******************\n\n")
 
-        print("\ncross checking tf model")
+        print("\nCross checking tf model")
         import tensorflow as tf
         loaded = tf.saved_model.load(args.output_tf_saved_path)
         print(list(loaded.signatures.keys()))
