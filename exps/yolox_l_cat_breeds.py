@@ -43,7 +43,7 @@ class Exp(MyExp):
 
         # --------------  training config --------------------- #
         self.warmup_epochs = 5
-        self.max_epoch = 300
+        self.max_epoch = 10
         self.warmup_lr = 0
         self.basic_lr_per_img = 0.01 / 64.0
         self.scheduler = "yoloxwarmcos"
@@ -51,14 +51,14 @@ class Exp(MyExp):
         self.min_lr_ratio = 0.05
         self.ema = True
         self.max_labels_tt = 25
-        self.max_labels_mosaicd = 75
-        self.flip_image = False
+        self.max_labels_mosaicd = 50
+        self.flip_image = True
 
         self.weight_decay = 5e-4
         self.momentum = 0.9
         self.print_interval = 100
         
-        self.eval_interval = 10
+        self.eval_interval = 1
         self.exp_name = os.path.split(os.path.realpath(__file__))[1].split(".")[0]
         # self.exp_name = "yolox_s_vjs_fp16"
 
