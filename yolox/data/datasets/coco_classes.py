@@ -59,3 +59,33 @@ CLASS_NAMES_FOR_TRAIN_AP = {
     23: "T_L", 
     24: "Ntg"
 }
+
+COCO_CLASSES = [
+    "Not_Cat",
+    "Birman", 
+    "British_Shorthair", 
+    "Norwegian_Forest", 
+    "Persian", 
+    "Siamese", 
+    "Sphynx",
+    "Abyssinian",
+    "Scottish_Fold",
+    "Maine_Coon",
+    "Balinese",
+    "Russian_Blue",
+    "Savannah",
+    "Bengal",
+    "British_Longhair",
+    "Burmese",
+    "Dev",
+    "Munchkin",
+    "Oriental_Shorthair",
+    "Ragdoll",
+    "Sai",
+    "Toyger"
+]
+
+CLASS_NAMES_FOR_TRAIN_AP = {
+    idx:d for idx, d in enumerate(COCO_CLASSES)
+}
+
