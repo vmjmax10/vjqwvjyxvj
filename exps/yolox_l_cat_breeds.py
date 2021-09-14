@@ -11,7 +11,7 @@ class Exp(MyExp):
         super(Exp, self).__init__()
         
         # ---------------- model config ---------------- #
-        self.num_classes = 25
+        self.num_classes = 22
         self.depth = 1.0
         self.width = 1.0
 
@@ -22,8 +22,8 @@ class Exp(MyExp):
         self.multiscale_range = 0
         # self.random_size = (14, 26)
         self.data_dir = "/content/vjqwvjyxvj/gdrive/MyDrive/DATASET/CAT_BREEDS_DATASET_DICTS"
-        self.train_ann = "CAT_BREEDS_TRAIN.json"
-        self.val_ann = "CAT_BREEDS_VAL.json"
+        self.train_ann = "CAT_BREEDS_TRAIN_NC_coco_format.json"
+        self.val_ann = "CAT_BREEDS_VAL_NC_coco_format.json"
         self.train_img_dir = "train"
         self.val_img_dir = "val"
         self.output_dir = "/content/vjqwvjyxvj/gdrive/MyDrive/TRAINED_MODELS/CAT_BREEDS_YOLOX"
