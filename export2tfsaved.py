@@ -166,3 +166,7 @@ if __name__ == "__main__":
 
 ## YOLOX_S
 # python export2tfsaved.py --tf_saved --t_size 640
+
+
+## ZIM ID
+# python export2tfsaved.py -f exps/yolox_s_zim_4_ids.py -c all_models/yolox_s_zim_4_ids.pth --output_onnx_path all_models/yolox_s_zim_4_ids.onnx --t_size 640

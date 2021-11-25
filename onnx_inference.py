@@ -56,7 +56,7 @@ if __name__ == '__main__':
     session = onnxruntime.InferenceSession(args.model)
     input_name = session.get_inputs()[0].name
 
-    while 1:
+    while 0:
         
         ret_val, origin_img = cap.read()
 
@@ -109,6 +109,77 @@ if __name__ == '__main__':
                 break
         else:
             break
+    
+
+    if 1:
+
+        import cv2
+        import json
+
+        with open("folder_wise.json") as f:
+            f_wise = json.load(f)
+
+        main_dir = "3e83ee19a84517d72ef7f4f53d8b92df"
+        cv2.namedWindow("disp", cv2.WINDOW_NORMAL)
+
+        for folder, info in f_wise.items():
+
+            if folder != "e2b5f95453d95db8b57fe2f05a2f1114":
+                continue
+            
+            for img_info in info:
+
+                origin_img = cv2.imread(img_info["image_path"])
+                if origin_img is None:
+                    continue
+
+                if "two" not in img_info["report"]:
+                    continue
+
+                img, ratio = preprocess(origin_img, input_shape)
+
+                img_t = img[None, :, :, :]
+                ort_inputs = {input_name: img_t}
+                output = session.run(None, ort_inputs)
+                pred = output[0] 
+            
+                predictions = demo_postprocess(pred, input_shape, p6=args.with_p6)[0]
+
+                boxes = predictions[:, :4]
+                scores = predictions[:, 4:5] * predictions[:, 5:]
+
+                boxes_xyxy = np.ones_like(boxes)
+                boxes_xyxy[:, 0] = boxes[:, 0] - boxes[:, 2]/2.
+                boxes_xyxy[:, 1] = boxes[:, 1] - boxes[:, 3]/2.
+                boxes_xyxy[:, 2] = boxes[:, 0] + boxes[:, 2]/2.
+                boxes_xyxy[:, 3] = boxes[:, 1] + boxes[:, 3]/2.
+                boxes_xyxy /= ratio
+
+                dets = multiclass_nms(boxes_xyxy, scores, nms_thr=args.nms, score_thr=args.conf)
+                
+                if dets is not None:
+                    final_boxes, final_scores, final_cls_inds = dets[:, :4], dets[:, 4], dets[:, 5]
+                   
+                    origin_img = vis(
+                        origin_img, 
+                        final_boxes, 
+                        final_scores, 
+                        final_cls_inds,
+                        conf=args.conf, 
+                        class_names=COCO_CLASSES
+                    )
+
+                    text = img_info["report"]
+                    cv2.putText(origin_img, text, (15, 15), 1, 1, (0, 0, 255), thickness=2)
+
+                    cv2.imshow("disp", origin_img)
+                    k = cv2.waitKey(0)
+
+                    if k == ord("q"):
+                        exit()
+
+
+
 
 # python onnx_inference.py --tsize 640 --conf 0.50 --nms 0.6 -m all_models/yolox_s_vjs.onnx
 
