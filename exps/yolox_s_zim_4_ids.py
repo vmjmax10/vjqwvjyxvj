@@ -19,19 +19,19 @@ class Exp(MyExp):
         # set worker to 4 for shorter dataloader init time
         self.data_num_workers = 4
         self.input_size = (640, 640)  # (height, width)
-        self.multiscale_range = 0
-        # self.random_size = (14, 26)
-        self.data_dir = "/content/vjqwvjyxvj/gdrive/MyDrive/DATASET/VIDEO_ANALYSIS_JS/pre_final"
-        self.train_ann = "annotations/instances_train2017.json"
-        self.val_ann = "annotations/instances_val2017.json"
-        self.train_img_dir = "train2017"
-        self.val_img_dir = "val2017"
-        self.output_dir = "/content/vjqwvjyxvj/gdrive/MyDrive/TRAINED_MODELS/VIDEO_ANALYSIS_JS"
+        self.multiscale_range = 3
+        self.random_size = (14, 26)
+        self.data_dir = "/content/vjqwvjyxvj/gdrive/MyDrive/DATASET/ID_ZIM_DATASET_DICTS/YOLOX"
+        self.train_ann = "train_coco.json"
+        self.val_ann = "val_coco.json"
+        self.train_img_dir = "train"
+        self.val_img_dir = "val"
+        self.output_dir = "/content/vjqwvjyxvj/gdrive/MyDrive/TRAINED_MODELS/ID_ZIM_DATASET_DICTS"
         
         # --------------- transform config ----------------- #
         self.mosaic_prob = 1.0
         self.mixup_prob = 1.0
-        self.hsv_prob = 1.0
+        self.hsv_prob = 2.0
         self.flip_prob = -1.0
         self.degrees = 5.0
         self.translate = 0.1
@@ -47,11 +47,11 @@ class Exp(MyExp):
         self.warmup_lr = 0
         self.basic_lr_per_img = 0.01 / 32.0
         self.scheduler = "yoloxwarmcos"
-        self.no_aug_epochs = 15
+        self.no_aug_epochs = 50
         self.min_lr_ratio = 0.05
         self.ema = True
-        self.max_labels_tt = 100
-        self.max_labels_mosaicd = 150
+        self.max_labels_tt = 25
+        self.max_labels_mosaicd = 40
         self.flip_image = False
 
         self.weight_decay = 5e-4
