@@ -85,7 +85,27 @@ COCO_CLASSES = [
     "Toyger"
 ]
 
+
+COCO_CLASSES = [
+    "CARD_TYPE",
+    "NID_NUMBER",
+    "FIRST_NAME",
+    "SUR_NAME",
+    "DOB",
+    "ISSUE_DATE",
+    "GENDER",
+    "PLACE_BIRTH",
+    "EXPIRY_DATE",
+    "PASSPORT_NO",
+    "OCCUPATION",
+    "VILLAGE_OF_ORIGIN",
+    "CARD_VALUES",
+    "ID_CARD"
+]
+
 CLASS_NAMES_FOR_TRAIN_AP = {
     idx:d for idx, d in enumerate(COCO_CLASSES)
 }
+
+
 
