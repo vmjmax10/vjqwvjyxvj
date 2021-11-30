@@ -11,7 +11,7 @@ class Exp(MyExp):
         super(Exp, self).__init__()
         
         # ---------------- model config ---------------- #
-        self.num_classes = 14
+        self.num_classes = 16
         self.depth = 0.33
         self.width = 0.50
 
@@ -19,8 +19,8 @@ class Exp(MyExp):
         # set worker to 4 for shorter dataloader init time
         self.data_num_workers = 4
         self.input_size = (640, 640)  # (height, width)
-        self.multiscale_range = 3
-        self.random_size = (14, 26)
+        self.multiscale_range = 1
+        # self.random_size = (14, 26)
         self.data_dir = "/content/vjqwvjyxvj/gdrive/MyDrive/DATASET/ID_ZIM_DATASET_DICTS/YOLOX"
         self.train_ann = "train_coco.json"
         self.val_ann = "val_coco.json"
@@ -38,7 +38,7 @@ class Exp(MyExp):
         self.mosaic_scale = (0.1, 2)
         self.mixup_scale = (0.5, 1.5)
         self.shear = 2.0
-        self.perspective = 0.0
+        self.perspective = 1.0
         self.enable_mixup = True
 
         # --------------  training config --------------------- #
