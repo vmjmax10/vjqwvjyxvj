@@ -100,7 +100,9 @@ COCO_CLASSES = [
     "OCCUPATION",
     "VILLAGE_OF_ORIGIN",
     "CARD_VALUES",
-    "ID_CARD"
+    "ZIM_PASSPORT",
+    "ZIM_NR",
+    "ZIM_DL"
 ]
 
 CLASS_NAMES_FOR_TRAIN_AP = {
