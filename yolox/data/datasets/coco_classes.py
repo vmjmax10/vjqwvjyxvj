@@ -102,7 +102,8 @@ COCO_CLASSES = [
     "CARD_VALUES",
     "ZIM_PASSPORT",
     "ZIM_NR",
-    "ZIM_DL"
+    "ZIM_DL",
+    "GAPS"
 ]
 
 CLASS_NAMES_FOR_TRAIN_AP = {
