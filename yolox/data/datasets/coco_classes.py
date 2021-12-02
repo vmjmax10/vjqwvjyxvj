@@ -87,7 +87,7 @@ COCO_CLASSES = [
 
 
 COCO_CLASSES = [
-    "CARD_TYPE",
+    "ID_CARD",
     "NID_NUMBER",
     "FIRST_NAME",
     "SUR_NAME",
