@@ -29,16 +29,16 @@ class Exp(MyExp):
         self.output_dir = "/content/vjqwvjyxvj/gdrive/MyDrive/TRAINED_MODELS/ID_ZIM_DATASET_DICTS"
         
         # --------------- transform config ----------------- #
-        self.mosaic_prob = 2.0
-        self.mixup_prob = 2.0
-        self.hsv_prob = 3.0
+        self.mosaic_prob = 5.0
+        self.mixup_prob = 5.0
+        self.hsv_prob = 5.0
         self.flip_prob = -1.0
         self.degrees = 10.0
-        self.translate = 0.5
-        self.mosaic_scale = (0.1, 2)
-        self.mixup_scale = (0.5, 1.5)
-        self.shear = 2.0
-        self.perspective = 1.0
+        self.translate = 1.0
+        self.mosaic_scale = (0.1, 3)
+        self.mixup_scale = (0.5, 3.5)
+        self.shear = 5.0
+        self.perspective = 2.0
         self.enable_mixup = True
 
         # --------------  training config --------------------- #
@@ -65,4 +65,4 @@ class Exp(MyExp):
         # -----------------  testing config ------------------ #
         self.test_size = (640, 640)
         self.test_conf = 0.01
-        self.nmsthre = 0.20
+        self.nmsthre = 0.25
