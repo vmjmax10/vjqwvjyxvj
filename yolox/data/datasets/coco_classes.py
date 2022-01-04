@@ -106,6 +106,11 @@ COCO_CLASSES = [
     "GAPS"
 ]
 
+
+COCO_CLASSES = [
+    "word"
+]
+
 CLASS_NAMES_FOR_TRAIN_AP = {
     idx:d for idx, d in enumerate(COCO_CLASSES)
 }
