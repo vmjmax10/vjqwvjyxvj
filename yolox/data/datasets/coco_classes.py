@@ -111,6 +111,10 @@ COCO_CLASSES = [
     "word"
 ]
 
+COCO_CLASSES = [
+    "inv", "tb", "th", "tc", "thr", "vnd"
+]
+
 CLASS_NAMES_FOR_TRAIN_AP = {
     idx:d for idx, d in enumerate(COCO_CLASSES)
 }
