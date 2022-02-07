@@ -112,7 +112,11 @@ COCO_CLASSES = [
 ]
 
 COCO_CLASSES = [
-    "inv", "tb", "th", "tc", "thr", "vnd"
+    # "inv", 
+    "tb", 
+    "th", 
+    "tc", 
+    # "thr", "vnd"
 ]
 
 CLASS_NAMES_FOR_TRAIN_AP = {

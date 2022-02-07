@@ -11,14 +11,14 @@ class Exp(MyExp):
         super(Exp, self).__init__()
         
         # ---------------- model config ---------------- #
-        self.num_classes = 6
+        self.num_classes = 3
         self.depth = 0.67
         self.width = 0.75
 
         # ---------------- dataloader config ---------------- #
         # set worker to 4 for shorter dataloader init time
         self.data_num_workers = 4
-        self.input_size = (1536, 1536)  # (height, width)
+        self.input_size = (768, 768)  # (height, width)
         self.multiscale_range = 0
         # self.random_size = (14, 26)
         self.data_dir = "/content/vjqwvjyxvj/gdrive/MyDrive/DATASET/LAYOUT_IDENTIFICATION/YOLOX"
@@ -35,24 +35,24 @@ class Exp(MyExp):
         self.flip_prob = -1.0
         self.degrees = 5.0
         self.translate = 0.0
-        self.mosaic_scale = (0.1, 2)
-        self.mixup_scale = (0.5, 1.5)
+        self.mosaic_scale = (0.1, 3.5)
+        self.mixup_scale = (0.5, 2.5)
         self.shear = 2.0
         self.perspective = 1.0
         self.enable_mixup = True
 
         # --------------  training config --------------------- #
         self.warmup_epochs = 5
-        self.max_epoch = 300
+        self.max_epoch = 1000
         self.warmup_lr = 0
         self.basic_lr_per_img = 0.01 / 64.0
         self.scheduler = "yoloxwarmcos"
-        self.no_aug_epochs = 15
+        self.no_aug_epochs = 50
         self.min_lr_ratio = 0.05
         self.ema = True
         self.max_labels_tt = 50
         self.max_labels_mosaicd = 100
-        self.flip_image = True
+        self.flip_image = False
 
         self.weight_decay = 5e-4
         self.momentum = 0.9
