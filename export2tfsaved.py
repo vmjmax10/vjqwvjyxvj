@@ -173,3 +173,15 @@ if __name__ == "__main__":
 
 ## WORD DET
 # python export2tfsaved.py -f exps/yolox_s_word_det.py -c all_models/yolox_s_word_det.pth --output_onnx_path all_models/yolox_s_word_det.onnx --t_size 1280
+
+
+## WORD DET M
+# python export2tfsaved.py -f exps/yolox_m_word_det.py -c all_models/yolox_m_word_det.pth --output_onnx_path all_models/yolox_m_word_det.onnx --t_size 1536
+
+
+## LAYOUT M
+# python export2tfsaved.py -f exps/yolox_m_layout.py -c all_models/yolox_m_layout.pth --output_onnx_path all_models/yolox_m_layout.onnx --t_size 768
+
+
+## LAYOUT S
+# python export2tfsaved.py -f exps/yolox_s_layout.py -c all_models/yolox_s_layout.pth --output_onnx_path all_models/yolox_s_layout.onnx --t_size 768
