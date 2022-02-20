@@ -112,7 +112,7 @@ COCO_CLASSES = [
 ]
 
 COCO_CLASSES = [
-    # "inv", 
+    "word", 
     "tb", 
     "th", 
     "tc", 
