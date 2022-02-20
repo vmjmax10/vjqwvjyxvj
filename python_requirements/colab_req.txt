@@ -28,7 +28,7 @@ Markdown==3.3.4
 matplotlib==3.4.3
 networkx==2.6.2
 ninja==1.10.2
-numpy==1.18.5
+numpy==1.20.1
 oauthlib==3.1.1
 onnx==1.10.1
 onnx-simplifier==0.3.6
