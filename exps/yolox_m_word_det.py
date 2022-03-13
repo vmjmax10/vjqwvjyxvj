@@ -18,7 +18,7 @@ class Exp(MyExp):
         # ---------------- dataloader config ---------------- #
         # set worker to 4 for shorter dataloader init time
         self.data_num_workers = 4
-        self.input_size = (1536, 1536)  # (height, width)
+        self.input_size = (2048, 2048)  # (height, width)
         self.multiscale_range = 0
         # self.random_size = (14, 26)
         self.data_dir = "/content/vjqwvjyxvj/gdrive/MyDrive/DATASET/LAYOUT_WORD_DS/YOLOX"

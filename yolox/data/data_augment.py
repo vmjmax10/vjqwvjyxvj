@@ -11,6 +11,7 @@ http://arxiv.org/abs/1512.02325
 
 import math
 import random
+import re
 
 import cv2
 import numpy as np
@@ -32,6 +33,10 @@ def augment_hsv(img, hgain=0.015, sgain=0.7, vgain=0.4):
         (cv2.LUT(hue, lut_hue), cv2.LUT(sat, lut_sat), cv2.LUT(val, lut_val))
     ).astype(dtype)
     cv2.cvtColor(img_hsv, cv2.COLOR_HSV2BGR, dst=img)  # no return needed
+
+
+def get_gray_version(img):
+    return cv2.cvtColor(cv2.cvtColor(img, cv2.COLOR_BGR2GRAY), cv2.COLOR_GRAY2BGR)
 
 
 def box_candidates(box1, box2, wh_thr=2, ar_thr=20, area_thr=0.2):
@@ -196,6 +201,10 @@ class TrainTransform:
         boxes_o = xyxy2cxcywh(boxes_o)
 
         augment_hsv(image)
+        
+        if random.randint(1, 5) == 3:
+            image = get_gray_version(image)
+
 
         ## NO MIRRORING AS LFF -> RFF is there
         image_t, boxes = _mirror(image, boxes, flip=self.flip)
