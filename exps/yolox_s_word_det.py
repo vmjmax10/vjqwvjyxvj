@@ -43,9 +43,9 @@ class Exp(MyExp):
 
         # --------------  training config --------------------- #
         self.warmup_epochs = 5
-        self.max_epoch = 1000
+        self.max_epoch = 600
         self.warmup_lr = 0
-        self.basic_lr_per_img = 0.01 / 64.0
+        self.basic_lr_per_img = 0.001 / 64.0
         self.scheduler = "yoloxwarmcos"
         self.no_aug_epochs = 50
         self.min_lr_ratio = 0.05
@@ -56,9 +56,9 @@ class Exp(MyExp):
 
         self.weight_decay = 5e-4
         self.momentum = 0.9
-        self.print_interval = 40
+        self.print_interval = 120
         
-        self.eval_interval = 5
+        self.eval_interval = 3
         self.exp_name = os.path.split(os.path.realpath(__file__))[1].split(".")[0]
         # self.exp_name = "yolox_s_vjs_fp16"
 
