@@ -29,8 +29,8 @@ class Exp(MyExp):
         self.output_dir = "/content/vjqwvjyxvj/gdrive/MyDrive/TRAINED_MODELS/LAYOUT_WORD_DS"
         
         # --------------- transform config ----------------- #
-        self.mosaic_prob = 3.0
-        self.mixup_prob = 3.0
+        self.mosaic_prob = 1.0
+        self.mixup_prob = 1.0
         self.hsv_prob = 2.0
         self.flip_prob = -1.0
         self.degrees = 5.0

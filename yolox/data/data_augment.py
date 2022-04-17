@@ -200,7 +200,8 @@ class TrainTransform:
         # bbox_o: [xyxy] to [c_x,c_y,w,h]
         boxes_o = xyxy2cxcywh(boxes_o)
 
-        augment_hsv(image)
+        if random.randint(0, 1):
+            augment_hsv(image)
         
         if random.randint(1, 5) in (1, 3):
             image = get_gray_version(image)
