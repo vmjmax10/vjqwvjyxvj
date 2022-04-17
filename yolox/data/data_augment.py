@@ -202,9 +202,8 @@ class TrainTransform:
 
         augment_hsv(image)
         
-        if random.randint(1, 5) == 3:
+        if random.randint(1, 5) in (1, 3):
             image = get_gray_version(image)
-
 
         ## NO MIRRORING AS LFF -> RFF is there
         image_t, boxes = _mirror(image, boxes, flip=self.flip)
