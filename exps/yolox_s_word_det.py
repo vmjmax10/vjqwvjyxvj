@@ -29,8 +29,8 @@ class Exp(MyExp):
         self.output_dir = "/content/vjqwvjyxvj/gdrive/MyDrive/TRAINED_MODELS/LAYOUT_WORD_DS"
         
         # --------------- transform config ----------------- #
-        self.mosaic_prob = 1.0
-        self.mixup_prob = 1.0
+        self.mosaic_prob = 2.0
+        self.mixup_prob = 2.0
         self.hsv_prob = 2.0
         self.flip_prob = -1.0
         self.degrees = 5.0
@@ -42,12 +42,12 @@ class Exp(MyExp):
         self.enable_mixup = True
 
         # --------------  training config --------------------- #
-        self.warmup_epochs = 50
-        self.max_epoch = 300
+        self.warmup_epochs = 30
+        self.max_epoch = 500
         self.warmup_lr = 0
         self.basic_lr_per_img = 0.01 / 64.0
         self.scheduler = "yoloxwarmcos"
-        self.no_aug_epochs = 50
+        self.no_aug_epochs = 30
         self.min_lr_ratio = 0.05
         self.ema = True
         self.max_labels_tt = 1000
