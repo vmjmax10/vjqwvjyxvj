@@ -25,7 +25,7 @@ class Exp(MyExp):
         self.train_ann = "train_coco.json"
         self.val_ann = "val_coco.json"
         self.train_img_dir = "train"
-        self.val_img_dir = "train"
+        self.val_img_dir = "val"
         self.output_dir = "/content/vjqwvjyxvj/gdrive/MyDrive/TRAINED_MODELS/LAYOUT_WORD_DS"
         
         # --------------- transform config ----------------- #
@@ -39,7 +39,7 @@ class Exp(MyExp):
         self.mixup_scale = (0.5, 2.5)
         self.shear = 2.0
         self.perspective = 0.0
-        self.enable_mixup = True
+        self.enable_mixup = False
 
         # --------------  training config --------------------- #
         self.warmup_epochs = 50

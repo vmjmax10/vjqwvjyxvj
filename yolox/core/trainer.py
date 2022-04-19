@@ -198,8 +198,8 @@ class Trainer:
             else:
                 self.model.head.use_l1 = True
             
-            # if self.epoch + 1 == self.max_epoch - self.exp.no_aug_epochs:
-            #     self.exp.eval_interval = 1
+            if not self.no_aug:
+                self.exp.eval_interval = 1
             
             if not self.no_aug:
                 self.save_ckpt(ckpt_name="last_mosaic_epoch")
