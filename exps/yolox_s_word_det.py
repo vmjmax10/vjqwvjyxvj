@@ -25,7 +25,7 @@ class Exp(MyExp):
         self.train_ann = "train_coco.json"
         self.val_ann = "val_coco.json"
         self.train_img_dir = "train"
-        self.val_img_dir = "val"
+        self.val_img_dir = "train"
         self.output_dir = "/content/vjqwvjyxvj/gdrive/MyDrive/TRAINED_MODELS/LAYOUT_WORD_DS"
         
         # --------------- transform config ----------------- #
@@ -42,10 +42,10 @@ class Exp(MyExp):
         self.enable_mixup = False
 
         # --------------  training config --------------------- #
-        self.warmup_epochs = 50
+        self.warmup_epochs = 30
         self.max_epoch = 600
         self.warmup_lr = 0
-        self.basic_lr_per_img = 0.01 / 24.0
+        self.basic_lr_per_img = 0.01 / 16.0
         self.scheduler = "yoloxwarmcos"
         self.no_aug_epochs = 600
         self.min_lr_ratio = 0.05
@@ -56,7 +56,7 @@ class Exp(MyExp):
 
         self.weight_decay = 5e-4
         self.momentum = 0.9
-        self.print_interval = 240
+        self.print_interval = 280
         
         self.eval_interval = 6
         self.exp_name = os.path.split(os.path.realpath(__file__))[1].split(".")[0]

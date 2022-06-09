@@ -116,6 +116,7 @@ COCO_CLASSES = [
     "tb", 
     "th", 
     "tc", 
+    "db"
     # "thr", "vnd"
 ]
 
