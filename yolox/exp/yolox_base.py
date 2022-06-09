@@ -114,7 +114,7 @@ class Exp(BaseExp):
         with wait_for_the_master(local_rank):
             dataset = COCODataset(
                 data_dir=self.data_dir,
-                name=f"train_{self.train_img_dir}",
+                name=self.train_img_dir,
                 json_file=self.train_ann,
                 img_size=self.input_size,
                 preproc=TrainTransform(
@@ -255,7 +255,7 @@ class Exp(BaseExp):
         valdataset = COCODataset(
             data_dir=self.data_dir,
             json_file=self.val_ann,
-            name=f"val_{self.val_img_dir}",
+            name=self.val_img_dir,
             img_size=self.test_size,
             preproc=ValTransform(legacy=legacy),
             cache=cache_img
