@@ -285,6 +285,8 @@ def main(exp, args):
         model.load_state_dict(ckpt["model"])
         logger.info("loaded checkpoint done.")
 
+        
+
     if args.fuse:
         logger.info("\tFusing model...")
         model = fuse_model(model)
