@@ -96,10 +96,30 @@ def main():
     traced_script_module_optimized = optimize_for_mobile(traced_script_module)
     traced_script_module_optimized._save_for_lite_interpreter(args.output_lite_path)
 
+    traced_script_module = traced_script_module.eval()
+    traced_script_module = traced_script_module.to(torch.device('cpu'))
+
+    ## 
+    with torch.no_grad():
+        out_script = traced_script_module(dummy_input)
+        print("input shape", dummy_input.shape)
+        print("output shape", out_script.shape)
+
     print("\n\n\n*****************FINISHED******************\n\n")
 
 if __name__ == "__main__":
     main()
+
+    # import torch
+    # import io
+    # dummy_input = torch.randn(1, 3, 640, 640)
+    # traced_script_module = torch.jit.load("all_models/yolox_nano_vjs.ptl")
+    # with torch.no_grad():
+    #     out_script = traced_script_module(dummy_input)
+    #     print(out_script.shape)
+    #     np_arr = out_script.cpu().detach().numpy()
+    #     print(np_arr.shape, np_arr[0].shape)
+    
 
 
 ## YOLOX_NANO

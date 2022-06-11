@@ -124,5 +124,6 @@ CLASS_NAMES_FOR_TRAIN_AP = {
     idx:d for idx, d in enumerate(COCO_CLASSES)
 }
 
+# COCO_CLASSES = [d[0] for d in _COCO_CLASSES_AND_COLORS]
 
 
