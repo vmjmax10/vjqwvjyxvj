@@ -90,20 +90,6 @@ def demo_postprocess(outputs, img_size, p6=False):
 
     grids = np.concatenate(grids, 1)
     expanded_strides = np.concatenate(expanded_strides, 1)
-
-    # print(grids.shape, expanded_strides.shape)
-
-    # print(grids[0][0], expanded_strides[0][0])
-    # print(grids[0][4000], expanded_strides[0][4000])
-    # print(grids[0][6399], expanded_strides[0][6399])
-
-    # print(grids[0][6400], expanded_strides[0][6400])
-    # print(grids[0][7999], expanded_strides[0][7999])
-
-    # print(grids[0][8000], expanded_strides[0][8000])
-    # print(grids[0][8399], expanded_strides[0][8399])
-
-    # exit()
     
     outputs[..., :2] = (outputs[..., :2] + grids) * expanded_strides
     outputs[..., 2:4] = np.exp(outputs[..., 2:4]) * expanded_strides
