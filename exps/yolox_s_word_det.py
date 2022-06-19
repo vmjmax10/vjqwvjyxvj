@@ -21,7 +21,7 @@ class Exp(MyExp):
         self.input_size = (2048, 2048)  # (height, width)
         self.multiscale_range = 0
         # self.random_size = (14, 26)
-        self.data_dir = "/content/vjqwvjyxvj/gdrive/MyDrive/DATASET/LAYOUT_WORD_DS/YOLOX"
+        self.data_dir = "/content/vjqwvjyxvj/gdrive/MyDrive/DATASET/LAYOUT_WORD_DS/YOLOX_INV_STM"
         self.train_ann = "train_coco.json"
         self.val_ann = "val_coco.json"
         self.train_img_dir = "train"
@@ -43,11 +43,11 @@ class Exp(MyExp):
 
         # --------------  training config --------------------- #
         self.warmup_epochs = 30
-        self.max_epoch = 600
+        self.max_epoch = 400
         self.warmup_lr = 0
-        self.basic_lr_per_img = 0.01 / 16.0
+        self.basic_lr_per_img = 0.01 / 24.0
         self.scheduler = "yoloxwarmcos"
-        self.no_aug_epochs = 600
+        self.no_aug_epochs = 400
         self.min_lr_ratio = 0.05
         self.ema = True
         self.max_labels_tt = 1000
@@ -56,9 +56,9 @@ class Exp(MyExp):
 
         self.weight_decay = 5e-4
         self.momentum = 0.9
-        self.print_interval = 280
+        self.print_interval = 125
         
-        self.eval_interval = 6
+        self.eval_interval = 3
         self.exp_name = os.path.split(os.path.realpath(__file__))[1].split(".")[0]
         # self.exp_name = "yolox_s_vjs_fp16"
 
