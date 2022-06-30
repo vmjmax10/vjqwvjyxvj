@@ -19,9 +19,9 @@ class Exp(MyExp):
         # set worker to 4 for shorter dataloader init time
         self.data_num_workers = 4
         self.input_size = (2048, 2048)  # (height, width)
-        self.multiscale_range = 0
+        self.multiscale_range = 20
         # self.random_size = (14, 26)
-        self.data_dir = "/content/vjqwvjyxvj/gdrive/MyDrive/DATASET/LAYOUT_WORD_DS/YOLOX_INV_STM"
+        self.data_dir = "/content/vjqwvjyxvj/gdrive/MyDrive/DATASET/LAYOUT_WORD_DS/YOLOX"
         self.train_ann = "train_coco.json"
         self.val_ann = "val_coco.json"
         self.train_img_dir = "train"
@@ -56,9 +56,9 @@ class Exp(MyExp):
 
         self.weight_decay = 5e-4
         self.momentum = 0.9
-        self.print_interval = 125
+        self.print_interval = 240
         
-        self.eval_interval = 3
+        self.eval_interval = 5
         self.exp_name = os.path.split(os.path.realpath(__file__))[1].split(".")[0]
         # self.exp_name = "yolox_s_vjs_fp16"
 
