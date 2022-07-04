@@ -19,7 +19,7 @@ class Exp(MyExp):
         # set worker to 4 for shorter dataloader init time
         self.data_num_workers = 4
         self.input_size = (2048, 2048)  # (height, width)
-        self.multiscale_range = 20
+        self.multiscale_range = 10
         # self.random_size = (14, 26)
         self.data_dir = "/content/vjqwvjyxvj/gdrive/MyDrive/DATASET/LAYOUT_WORD_DS/YOLOX"
         self.train_ann = "train_coco.json"
@@ -43,11 +43,11 @@ class Exp(MyExp):
 
         # --------------  training config --------------------- #
         self.warmup_epochs = 30
-        self.max_epoch = 400
+        self.max_epoch = 150
         self.warmup_lr = 0
-        self.basic_lr_per_img = 0.01 / 24.0
-        self.scheduler = "multistep"
-        self.no_aug_epochs = 400
+        self.basic_lr_per_img = 0.01 / 64.0
+        self.scheduler = "yoloxwarmcos"
+        self.no_aug_epochs = 150
         self.min_lr_ratio = 0.05
         self.ema = True
         self.max_labels_tt = 1000
