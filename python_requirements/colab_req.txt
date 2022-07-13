@@ -53,6 +53,7 @@ scikit-image==0.18.3
 scipy==1.4.1
 six==1.15.0
 tabulate==0.8.9
+tensorboard==2.1.1
 termcolor==1.1.0
 thop==0.0.31.post2005241907
 tifffile==2021.8.30
