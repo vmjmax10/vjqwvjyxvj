@@ -56,7 +56,7 @@ class Exp(MyExp):
 
         self.weight_decay = 5e-4
         self.momentum = 0.9
-        self.print_interval = 240
+        self.print_interval = 260
         
         self.eval_interval = 5
         self.exp_name = os.path.split(os.path.realpath(__file__))[1].split(".")[0]
