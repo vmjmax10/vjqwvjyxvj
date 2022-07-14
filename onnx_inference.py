@@ -12,7 +12,7 @@ import numpy as np
 import onnxruntime
 
 from yolox.data.data_augment import preproc as preprocess
-from yolox.data.datasets import COCO_CLASSES
+from yolox.data.datasets import COCO_CLASSES_VJS as COCO_CLASSES
 from yolox.utils import mkdir, multiclass_nms, demo_postprocess, vis
 
 MODEL_DIR = "all_models"
@@ -70,17 +70,18 @@ if __name__ == '__main__':
         if ret_val:
 
             # origin_img = origin_img[:, :, ::-1]
-  
+            st = time.time()
             img, ratio = preprocess(origin_img, input_shape)
 
             img_t = img[None, :, :, :]
             
             # print(img_t.flatten()[:30])
 
+            
             ort_inputs = {input_name: img_t}
             output = session.run(None, ort_inputs)
             pred = output[0]
-
+            
             # with torch.no_grad():
             #     out_script = traced_script_module(torch.from_numpy(img_t))
             #     pred = out_script.cpu().detach().numpy()
@@ -100,6 +101,7 @@ if __name__ == '__main__':
             boxes_xyxy /= ratio
 
             dets = multiclass_nms(boxes_xyxy, scores, nms_thr=args.nms, score_thr=args.conf)
+            print(time.time()-st)
             
             if dets is not None:
                 final_boxes, final_scores, final_cls_inds = dets[:, :4], dets[:, 4], dets[:, 5]

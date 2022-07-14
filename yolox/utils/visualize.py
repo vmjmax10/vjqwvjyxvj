@@ -9,10 +9,6 @@ __all__ = ["vis"]
 
 
 def vis(img, boxes, scores, cls_ids, conf=0.5, class_names=None):
-    # print(boxes, scores, cls_ids)
-    # for b, c, cs in zip(boxes, scores, cls_ids):
-    #     print(cs, c, b)
-    # exit()
 
     for i in range(len(boxes)):
         box = boxes[i]
