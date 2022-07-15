@@ -10,10 +10,11 @@ from torch import distributed as dist
 from torch import nn
 
 from .dist import _get_global_gloo_group, get_world_size
+from yolox.models.network_blocks import SiLU, QConv2d, QBatchNorm2d
 
 ASYNC_NORM = (
     nn.BatchNorm1d,
-    nn.BatchNorm2d,
+    QBatchNorm2d,
     nn.BatchNorm3d,
     nn.InstanceNorm1d,
     nn.InstanceNorm2d,

@@ -10,7 +10,7 @@ import torch.distributed as dist
 import torch.nn as nn
 
 from .base_exp import BaseExp
-
+from yolox.models.network_blocks import SiLU, QConv2d, QBatchNorm2d
 
 class Exp(BaseExp):
     def __init__(self):
@@ -78,7 +78,7 @@ class Exp(BaseExp):
 
         def init_yolo(M):
             for m in M.modules():
-                if isinstance(m, nn.BatchNorm2d):
+                if isinstance(m, QBatchNorm2d):
                     m.eps = 1e-3
                     m.momentum = 0.03
 
@@ -211,7 +211,7 @@ class Exp(BaseExp):
             for k, v in self.model.named_modules():
                 if hasattr(v, "bias") and isinstance(v.bias, nn.Parameter):
                     pg2.append(v.bias)  # biases
-                if isinstance(v, nn.BatchNorm2d) or "bn" in k:
+                if isinstance(v, QBatchNorm2d) or "bn" in k:
                     pg0.append(v.weight)  # no decay
                 elif hasattr(v, "weight") and isinstance(v.weight, nn.Parameter):
                     pg1.append(v.weight)  # apply decay

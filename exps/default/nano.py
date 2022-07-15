@@ -7,7 +7,7 @@ import os
 import torch.nn as nn
 
 from yolox.exp import Exp as MyExp
-
+from yolox.models.network_blocks import SiLU, QConv2d, QBatchNorm2d
 
 class Exp(MyExp):
     def __init__(self):
@@ -26,7 +26,7 @@ class Exp(MyExp):
 
         def init_yolo(M):
             for m in M.modules():
-                if isinstance(m, nn.BatchNorm2d):
+                if isinstance(m, QBatchNorm2d):
                     m.eps = 1e-3
                     m.momentum = 0.03
         if "model" not in self.__dict__:

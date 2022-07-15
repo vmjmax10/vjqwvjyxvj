@@ -4,6 +4,7 @@
 import argparse
 import os
 from loguru import logger
+import time
 
 import torch
 from torch import nn
@@ -11,7 +12,7 @@ import torchvision
 from torch.utils.mobile_optimizer import optimize_for_mobile
 
 from yolox.exp import get_exp
-from yolox.models.network_blocks import SiLU
+from yolox.models.network_blocks import SiLU, QConv2d
 from yolox.utils import replace_module
 
 MODEL_DIR = "all_models"
@@ -83,7 +84,9 @@ def main():
         ckpt = ckpt["model"]
     model.load_state_dict(ckpt)
     model = replace_module(model, nn.SiLU, SiLU)
+    
     model.head.decode_in_inference = False
+    model.eval()
 
     logger.info("loading checkpoint done.")
 
@@ -92,16 +95,43 @@ def main():
     else:
         dummy_input = torch.randn(1, 3, exp.test_size[0], exp.test_size[1])
 
+    st = time.time()
+    res = model(dummy_input)
+    print("time f32", st - time.time())
+
+    if "quant" in args.output_lite_path:
+
+        print("Getting qunatized info ")
+        backend = "qnnpack" ## mobile  ## fbgemm
+        model.qconfig = torch.quantization.get_default_qconfig(backend)
+    
+        print("Trying qunatization now", model.qconfig)
+        ## quantization
+        model_fp32_prepared = torch.quantization.prepare(model, inplace=False)
+        model_fp32_prepared(dummy_input)
+
+        model_int8 = torch.quantization.convert(model_fp32_prepared, inplace=False)
+        
+        res = model_int8(dummy_input)
+        
+        model = model_int8
+
+    ## trace now
     traced_script_module = torch.jit.trace(model, dummy_input)
     traced_script_module_optimized = optimize_for_mobile(traced_script_module)
+
     traced_script_module_optimized._save_for_lite_interpreter(args.output_lite_path)
 
+    ## 
     traced_script_module = traced_script_module.eval()
     traced_script_module = traced_script_module.to(torch.device('cpu'))
 
     ## 
     with torch.no_grad():
+        st = time.time()
         out_script = traced_script_module(dummy_input)
+        print("time f32", st - time.time())
+        
         print("input shape", dummy_input.shape)
         print("output shape", out_script.shape)
 
@@ -124,3 +154,5 @@ if __name__ == "__main__":
 
 ## YOLOX_NANO
 # python export2torchlite.py -f exps/yolox_nano_vjs.py -c all_models/yolox_nano_vjs.pth --output_lite_path all_models/yolox_nano_vjs.ptl --t_size 640
+
+# python export2torchlite.py -f exps/yolox_nano_vjs.py -c all_models/yolox_nano_vjs.pth --output_lite_path all_models/yolox_nano_vjs_quant.ptl --t_size 640

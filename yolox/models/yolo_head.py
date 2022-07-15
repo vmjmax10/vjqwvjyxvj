@@ -9,10 +9,10 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from yolox.utils import bboxes_iou
+from yolox.utils.boxes import bboxes_iou
 
 from .losses import IOUloss
-from .network_blocks import BaseConv, DWConv
+from .network_blocks import BaseConv, DWConv, QConv2d
 
 
 class YOLOXHead(nn.Module):
@@ -95,7 +95,7 @@ class YOLOXHead(nn.Module):
                 )
             )
             self.cls_preds.append(
-                nn.Conv2d(
+                QConv2d(
                     in_channels=int(256 * width),
                     out_channels=self.n_anchors * self.num_classes,
                     kernel_size=1,
@@ -104,7 +104,7 @@ class YOLOXHead(nn.Module):
                 )
             )
             self.reg_preds.append(
-                nn.Conv2d(
+                QConv2d(
                     in_channels=int(256 * width),
                     out_channels=4,
                     kernel_size=1,
@@ -113,7 +113,7 @@ class YOLOXHead(nn.Module):
                 )
             )
             self.obj_preds.append(
-                nn.Conv2d(
+                QConv2d(
                     in_channels=int(256 * width),
                     out_channels=self.n_anchors * 1,
                     kernel_size=1,
