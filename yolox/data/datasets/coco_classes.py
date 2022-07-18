@@ -114,7 +114,7 @@ COCO_CLASSES = [
 
 COCO_CLASSES = [
     "word", 
-    "tb", 
+    "sign", 
     "th", 
     "tc", 
     "db"
