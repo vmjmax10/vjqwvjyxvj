@@ -113,12 +113,18 @@ COCO_CLASSES = [
 ]
 
 COCO_CLASSES = [
+    "person", 
+    "atm_machine", 
+    "helmet", 
+    "shutter"
+]
+
+COCO_CLASSES = [
     "word", 
     "sign", 
     "th", 
     "tc", 
     "db"
-    # "thr", "vnd"
 ]
 
 CLASS_NAMES_FOR_TRAIN_AP = {

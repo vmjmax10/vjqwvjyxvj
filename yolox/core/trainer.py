@@ -6,6 +6,7 @@ import datetime
 import os
 import time
 from loguru import logger
+import pytz
 
 import torch
 from torch.nn.parallel import DistributedDataParallel as DDP
@@ -29,6 +30,8 @@ from yolox.utils import (
     synchronize
 )
 
+def get_IST_time(timeZ_Kl=pytz.timezone("Asia/Kolkata")):
+    return datetime.datetime.now(timeZ_Kl).strftime("%d-%m-%Y %H:%M:%S")
 
 class Trainer:
     def __init__(self, exp, args):
@@ -320,7 +323,8 @@ class Trainer:
     def save_ckpt(self, ckpt_name, update_best_ckpt=False):
         if self.rank == 0:
             save_model = self.ema_model.ema if self.use_model_ema else self.model
-            logger.info("Save weights to {}".format(self.file_name))
+            # logger.info("Save weights to {}".format(self.file_name))
+            logger.info(f"\nExecuted At => {get_IST_time()}")
             ckpt_state = {
                 "start_epoch": self.epoch + 1,
                 "model": save_model.state_dict(),

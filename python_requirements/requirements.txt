@@ -30,3 +30,4 @@ tensorflowjs==3.9.0
 ## EXTERNEL DEPENDECIES AND INSTALLATION
 ## 
 ## !pip3 install "git+https://github.com/cocodataset/cocoapi.git#subdirectory=PythonAPI"
+pytz==2022.1
