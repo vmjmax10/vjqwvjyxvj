@@ -14,6 +14,8 @@ test_files
 *.json
 *.zip
 
+!model_classes/*
+
 .ipynb_checkpoints
 .vscode
 
