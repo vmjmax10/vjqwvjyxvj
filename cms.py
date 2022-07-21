@@ -306,7 +306,7 @@ class CustomYolox_ONNX(object):
 
             vis_img = self.visualize(image.copy(), new_boxes, scores, cls_inds)
             cv2.imshow("disp", vis_img)
-            # k = cv2.waitKey(0)
+            k = cv2.waitKey(1)
             # if  k == ord("q"):
             #     exit()
 
