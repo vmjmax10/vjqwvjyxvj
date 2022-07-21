@@ -323,8 +323,6 @@ class Trainer:
     def save_ckpt(self, ckpt_name, update_best_ckpt=False):
         if self.rank == 0:
             save_model = self.ema_model.ema if self.use_model_ema else self.model
-            # logger.info("Save weights to {}".format(self.file_name))
-            logger.info(f"\nExecuted At => {get_IST_time()}")
             ckpt_state = {
                 "start_epoch": self.epoch + 1,
                 "model": save_model.state_dict(),
@@ -336,3 +334,4 @@ class Trainer:
                 self.file_name,
                 ckpt_name,
             )
+            logger.info(f"\nSaved weights, Executed At => {get_IST_time()}")
