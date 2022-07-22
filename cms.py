@@ -3,12 +3,15 @@ import argparse
 import json
 import os
 import time
+import math
 
 ## Third party Imports
 import cv2
 import numpy as np
 import onnxruntime
 
+NEXT_S_ID = 0
+MISS_THRESH = 3
 
 class DetectedObject(object):
     def __init__(
@@ -32,7 +35,7 @@ class CustomYolox_ONNX(object):
         cls_info_file_path="model_classes.json",
         nms_thresh=0.10, 
         infer_size=640,
-        cls_confidence=0.25, 
+        cls_confidence=-1, 
         is_visualize_mode=False
     ):
 
@@ -62,10 +65,22 @@ class CustomYolox_ONNX(object):
     def _set_model_info_and_visulization_params(self):
 
         self.input_shape = (self.infer_size, self.infer_size)
-        self.max_size_val = self.infer_size - 1 
+        self.num_classes = self.model_info["num_classes"]
 
         ## grids and expanded stride for model infer arch
         self._set_grids_and_expanded_strides()
+
+        if self.cls_confidence == -1:
+            self.min_class_confidence = {
+                int(k):v
+                for k, v in self.model_info[
+                    "min_class_confidences_for_detection"
+                ].items()
+            } 
+        else:
+            self.min_class_confidence = {
+                i:self.cls_confidence for i in range(self.num_classes)
+            }
 
         ## visualization
         self.classes = [
@@ -125,11 +140,9 @@ class CustomYolox_ONNX(object):
     def _multiclass_nms(self, boxes, scores):
     
         final_dets = []
-        num_classes = scores.shape[1]
-
-        for cls_ind in range(num_classes):
+        for cls_ind in range(self.num_classes):
             cls_scores = scores[:, cls_ind]
-            valid_score_mask = cls_scores > self.cls_confidence
+            valid_score_mask = cls_scores > self.min_class_confidence[cls_ind]
             if valid_score_mask.sum() == 0:
                 continue
             else:
@@ -207,8 +220,8 @@ class CustomYolox_ONNX(object):
             bbox = boxes[idx]
             x1 = int(max(1, int(bbox[0]*scale_w)-1))
             y1 = int(max(1, int(bbox[1]*scale_h)-1))
-            x2 = int(min(self.max_size_val*scale_w, int(bbox[2]*scale_w)+1))
-            y2 = int(min(self.max_size_val*scale_h, int(bbox[3]*scale_h+1)))
+            x2 = int(min(self.max_size_val_w*scale_w, int(bbox[2]*scale_w)+1))
+            y2 = int(min(self.max_size_val_h*scale_h, int(bbox[3]*scale_h+1)))
 
             w, h = x2 - x1, y2 - y1
             if w < 5 or h < 5:
@@ -216,7 +229,7 @@ class CustomYolox_ONNX(object):
             
             detected_objects.append(
                 DetectedObject(
-                    [x1, y1, x2, y2, (y2-y1)*(x2-x1)],
+                    [x1, y1, x2, y2, w*h],
                     cls_id,
                     round(float(scores[idx]), 2),
                     class_name=self.classes[cls_id]
@@ -225,57 +238,66 @@ class CustomYolox_ONNX(object):
           
         return detected_objects
 
-    def visualize(self, img, boxes, scores, cls_ids):
-       
-        for i in range(len(boxes)):
-
-            box = boxes[i]
-            cls_id = int(cls_ids[i])
-            score = scores[i]
-            if score < self.cls_confidence:
-                continue
-            x0 = int(box[0])
-            y0 = int(box[1])
-            x1 = int(box[2])
-            y1 = int(box[3])
-
-            color = self.colors[cls_id]
-            text = '{}:{:.1f}%'.format(self.classes[cls_id], score * 100)
-            
-            text = self.classes[cls_id]
-            txt_color = (
-                (0, 0, 0) 
-                if np.mean(self.colors[cls_id]) > 0.5 
-                else (255, 255, 255)
-            )
-            font = cv2.FONT_HERSHEY_SIMPLEX
-
-            txt_size = cv2.getTextSize(text, font, 0.4, 1)[0]
-            cv2.rectangle(img, (x0, y0), (x1, y1), color, 2)
-
-            # txt_bk_color = [int(bgr*0.7) for bgr in self.colors[cls_id]]
-            # cv2.rectangle(
-            #     img,
-            #     (x0, y0 - int(1.5*txt_size[1])),
-            #     (x0 + txt_size[0] + 1, y0),
-            #     txt_bk_color,
-            #     -1
-            # )
-            # cv2.putText(
-            #     img, 
-            #     text, 
-            #     (x0, y0 - int(0.75*txt_size[1])), 
-            #     font, 0.4, 
-            #     txt_color, 
-            #     thickness=1
-            # )
+    def visualize(self, img, all_detected_objects): 
+        for obj in all_detected_objects:
+            bbox = obj.bbox
+            color = self.colors[obj.class_id]
+            cv2.rectangle(img, (bbox[0], bbox[1]), (bbox[2], bbox[3]), color, 2)
 
         return img
+
+    def put_text_on_image(
+        self, 
+        image, 
+        text, 
+        x1=1,
+        y1=1,
+        txt_color=(0, 0, 255),
+        txt_background_color=(0, 0, 0),
+        font = cv2.FONT_HERSHEY_DUPLEX,
+        font_scale=1.0
+    ):
+
+        img_h, img_w = image.shape[:2]
+        txt_size = cv2.getTextSize(text, font, font_scale, 1)[0]
+
+        pos_x2 = min(img_w-1, x1+txt_size[0]+1)
+        pos_y2 = int(min(img_h-1, y1+txt_size[1]*1.15+1))
+
+        cv2.rectangle(
+            image,
+            (x1, y1),
+            (pos_x2, pos_y2),
+            txt_background_color,
+            -1
+        )
+        cv2.putText(
+            image, 
+            text, 
+            (x1, y1+int(txt_size[1]*1.075)), 
+            font, 
+            font_scale, 
+            txt_color, 
+            thickness=1
+        )
 
     def extract(self, image):
 
         if self.infer_session is None:
             return self._empty_response()
+        
+        img_h, img_w = image.shape[:2]
+        if img_h > img_w:
+            self.max_size_val_w = int(img_w*(self.infer_size/img_h))-1
+            self.max_size_val_h = self.infer_size - 1
+        else:
+            self.max_size_val_h = int(img_h*(self.infer_size/img_w))-1
+            self.max_size_val_w = self.infer_size - 1
+
+        image = resize_to_desired_sqaure_size_image_with_padding(
+            image, max_size=self.infer_size, pad_color=255
+        )
+        self.image = image
 
         # st = time.time()
         img, scale_w, scale_h = self._preprocess_image(image)
@@ -289,32 +311,20 @@ class CustomYolox_ONNX(object):
         boxes, scores, cls_inds = dets[:, :4], dets[:, 4], dets[:, 5]
         # print("time", time.time() -st)
         
-        # Testing purpose only
-        if self.is_visualize_mode:
-
-            new_boxes = []
-            for idx in range(len(boxes)):
-                bbox = boxes[idx]
-
-                x1 = float(max(1, int(bbox[0]*scale_w)))
-                y1 = float(max(1, int(bbox[1]*scale_h)))
-
-                x2 = float(min(self.max_size_val*scale_w, int(bbox[2]*scale_w)))
-                y2 = float(min(self.max_size_val*scale_h, int(bbox[3]*scale_h)))
-                
-                new_boxes.append([x1, y1, x2, y2])
-
-            vis_img = self.visualize(image.copy(), new_boxes, scores, cls_inds)
-            cv2.imshow("disp", vis_img)
-            k = cv2.waitKey(1)
-            # if  k == ord("q"):
-            #     exit()
-
-        return self.update_bbox_and_remove_unnecessary_data(
+        all_detected_objects = self.update_bbox_and_remove_unnecessary_data(
             boxes, scores, cls_inds, scale_w, scale_h
         )
+        # Testing purpose only
+        if self.is_visualize_mode:
+            ord_quit = ord("q")
+            vis_img = self.visualize(image.copy(), all_detected_objects)
+            cv2.imshow("disp", vis_img)
+            if cv2.waitKey(1) == ord_quit:
+                exit()
 
-# UTILS FUNCTIONS
+        return all_detected_objects
+
+# ##UTILS FUNCTIONS
 
 def resize_to_desired_max_size_for_processing(img, max_size=1200):
 
@@ -334,7 +344,9 @@ def resize_to_desired_max_size_for_processing(img, max_size=1200):
     img = cv2.resize(img, img_s_resized, interpolation=inter_ploation)
     return img
 
-def resize_to_desired_sqaure_size_image_with_padding(img, max_size=1280):
+def resize_to_desired_sqaure_size_image_with_padding(
+    img, max_size=1280, pad_color=0
+):
 
     img = resize_to_desired_max_size_for_processing(img, max_size=max_size)
     h, w, c = img.shape
@@ -342,20 +354,178 @@ def resize_to_desired_sqaure_size_image_with_padding(img, max_size=1280):
     assert c == 3
 
     if h != max_size:
-        pad_img = np.zeros(
+        pad_img = np.ones(
             [max_size-h, w, c], dtype=np.uint8
-        )
+        )*pad_color
         img = cv2.vconcat([img, pad_img])
 
     elif w != max_size:
 
-        pad_img = np.zeros(
+        pad_img = np.ones(
             [h, max_size-w, c], dtype=np.uint8
-        )
+        )*pad_color
         img = cv2.hconcat([img, pad_img])
 
     return img
 
+def get_iou(query_rect, available_rects):
+    
+    max_iou, max_a_intersection = 0, 0
+
+    for req_rect in available_rects:
+
+        x_right = min(query_rect[2], req_rect[2])
+        x_left = max(query_rect[0], req_rect[0])
+        y_bottom = min(query_rect[3], req_rect[3])
+        y_top = max(query_rect[1], req_rect[1])
+
+        if x_left < x_right and y_top < y_bottom:
+            max_intersection = (x_right-x_left)*(y_bottom-y_top)
+            min_area = min(query_rect[4], req_rect[4])
+            iou = max_intersection/min_area
+            if iou > max_iou and max_intersection > max_a_intersection:
+                max_iou = iou
+                max_a_intersection = max_intersection
+            
+    return max_iou
+
+# ## 
+def add_in_shutters_info(obj, shutters_info):
+    global NEXT_S_ID
+    if len(shutters_info) == 0:
+        NEXT_S_ID = 0
+    
+    NEXT_S_ID += 1
+
+    s_id = NEXT_S_ID
+    shutters_info[s_id] = {
+        "miss_thresh":MISS_THRESH,
+        "last_n_locations":[obj.bbox for _ in range(MISS_THRESH)],
+        "last_n_heights":[[obj.bbox[1], obj.bbox[3], obj.bbox[3]-obj.bbox[1]]],
+        "closing_or_opening_msg":"....",
+        "s_height_and_y2":[obj.bbox[3]-obj.bbox[1], obj.bbox[3]],
+        "is_opening":None,
+        "_y1":obj.bbox[1], 
+        "_y2":obj.bbox[3],
+        "max_y2":obj.bbox[3]
+    }
+
+def update_in_shutters_info(obj, shutters_info, s_id):
+
+    s_info = shutters_info[s_id]
+
+    s_info["miss_thresh"] = MISS_THRESH
+    bbox = obj.bbox
+
+    ## update _y1, _y2 --> y1 is top of shutter which is fixed entity
+    s_info["_y1"] = min(s_info["_y1"], bbox[1])
+    s_info["_y2"] = bbox[3]
+    s_info["max_y2"] = max(s_info["max_y2"], bbox[3])
+    
+    last_s_height = s_info["s_height_and_y2"][1] - s_info["_y1"]
+    cur_s_height = bbox[3] - s_info["_y1"]
+
+    if last_s_height > cur_s_height + 3:
+        msg = "OPENING"
+        s_info["is_opening"] = True
+    elif last_s_height + 3 < cur_s_height:
+        msg = "CLOSING"
+        s_info["is_opening"] = False
+    else:
+        msg = "...."
+
+    s_info["closing_or_opening_msg"] = msg
+
+    s_info["s_height_and_y2"] = [cur_s_height, bbox[3]]
+    
+    s_info["last_n_locations"] = shutters_info[s_id]["last_n_locations"][1:] + [
+        bbox
+    ]
+    
+    s_info["last_n_heights"] = [
+        [
+            min(s_info["_y1"], lnh[0]),
+            lnh[1],
+            lnh[1] - min(s_info["_y1"], lnh[0])
+        ]
+        for lnh in s_info["last_n_heights"]
+    ][-9:]
+    s_info["last_n_heights"] += [[s_info["_y1"], s_info["_y2"], s_info["_y2"]-s_info["_y1"]]]
+
+def check_if_already_exists(obj, shutters_info, found_s_ids, min_iou_thresh=0.15):
+    max_idx, max_iou = -1, min_iou_thresh
+    for s_id, s_info in shutters_info.items():
+        if s_id in found_s_ids:
+            continue
+        iou = get_iou(obj.bbox, s_info["last_n_locations"])
+        if iou > max_iou:
+            max_iou = iou
+            max_idx = s_id
+    return max_idx
+
+def remove_from_shutters_info(found_s_ids, shutters_info):
+    for s_id in list(shutters_info.keys()):
+        if s_id not in found_s_ids:
+            shutters_info[s_id]["miss_thresh"] -= 1
+            if shutters_info[s_id]["miss_thresh"] < 0:
+                del shutters_info[s_id]
+            else:
+                shutters_info[s_id]["last_n_heights"] = []
+
+def get_current_message_based_on_shutters_info(shutters_info, max_size_w, max_size_h):
+    
+    len_s_ids = len(shutters_info)
+
+    if len_s_ids == 0:
+        msg = "SHUTTERS OPEN"
+    else:
+        msgs = []
+        for s_id, s_info in shutters_info.items():
+
+            msg  = ""
+            len_heights = len(s_info["last_n_heights"])
+
+            if len_heights > 3:
+                
+                s_heights = [d[-1] for d in s_info["last_n_heights"]]
+                min_h = min(s_heights)
+                max_h = max(s_heights)
+
+                if max_h - min_h < max_h*0.05:
+                    
+                    if s_info["is_opening"]:
+                        max_s_height = s_info["max_y2"] - s_info["_y1"]
+                        cur_s_height =  s_info["s_height_and_y2"][0]
+
+                        percentage_open = 100 - round((cur_s_height/max_s_height)*100, 2)
+                        if percentage_open > 90:
+                            msg = f"Shutter({s_id}) => OPEN"
+                            print(f"Shutter({s_id}) => OPEN")
+                            # cv2.waitKey(5000)
+                        else:
+                            msg = f"Shutter({s_id}) => OPEN ({percentage_open}%)"
+
+                    elif s_info["is_opening"] is not None:
+                        msg = f"Shutter({s_id}) => CLOSED"
+                        print(f"Shutter({s_id}) => CLOSED")
+                        # cv2.waitKey(5000)
+                   
+                ## case of OPENING/CLOSING
+                else:
+                    msg = s_info["closing_or_opening_msg"]
+                    msg = f"Shutter({s_id}) => {msg}"
+
+            else:
+                msg = f"Shutter({s_id}) => Analyzing...."
+            
+            msgs.append(msg)
+
+        msg = ", ".join(msgs)
+
+    return msg
+
+
+# ### CMS VIDEO DEMO FUNCTION
 def cms_video_demo(args):
     
     if args.v_dir != "":
@@ -375,6 +545,9 @@ def cms_video_demo(args):
         print("please provide proper video info/path")
         exit()
 
+    total_videos = len(all_video_file_paths)
+    print(f"Total Video Files => {total_videos}")
+
     print("Model loading....", end="")
     # Load model
     cms_model = CustomYolox_ONNX(
@@ -382,38 +555,99 @@ def cms_video_demo(args):
         cls_info_file_path="model_classes/cms.json",
         nms_thresh=0.10, 
         infer_size=640,
-        cls_confidence=0.40, 
+        cls_confidence=-1, ## special -1 value tells to use the per class confidnece
         is_visualize_mode=bool(args.vis)
     )
     print("Finished")
 
     # Display
     cv2.namedWindow("disp", cv2.WINDOW_NORMAL)
+    ord_quit, ord_next, ord_skip = ord("q"), ord("n"), ord("s")
+    num_skip_frames = 75
+
+    infer_size = cms_model.infer_size
 
     ## run now
-    for video_path in all_video_file_paths:
-        print(f"\nStarting... session for {video_path}")
+    for v_idx, video_path in enumerate(all_video_file_paths, start=1):
+
+        print(f"\nStarting... session for ({v_idx}/{total_videos}) -> {video_path}")
+
+        global NEXT_S_ID
+        NEXT_S_ID = 1
 
         stream = cv2.VideoCapture(video_path)
         if not stream.isOpened():
             print(f"Error in video reading -> {video_path}")
             continue
         
+        width  = int(stream.get(cv2.CAP_PROP_FRAME_WIDTH))
+        height = int(stream.get(cv2.CAP_PROP_FRAME_HEIGHT))
+
+        if width > height:
+            max_size_w = infer_size
+            max_size_h = int(height * (infer_size/width))
+        else:
+            max_size_h = infer_size
+            max_size_w = int(width * (infer_size/height))
+
+        ## allowed shutter size (both at the same time)
+        max_size_hs = max_size_h*0.9
+        max_size_ws = max_size_w*0.9
+
+        # fps = stream.get(cv2.CAP_PROP_FPS)
+        # frame_count = stream.get(cv2.CAP_PROP_FRAME_COUNT)
+        # print(f"\nVideo Properties AW {max_size_ws}, AH {max_size_hs}")
+        
+        frame_idx, do_skip_idx = 0, False
         shutters_info = {}
 
         while stream.isOpened():
             ret, frame = stream.read()
             if ret:
-                frame = resize_to_desired_sqaure_size_image_with_padding(
-                    frame, max_size=640
+                frame_idx += 1
+                
+                if frame_idx < do_skip_idx:
+                    continue
+
+                all_detected_objects = cms_model.extract(frame)
+                
+                found_s_ids = []
+                ## add shutters info in session
+                for obj in all_detected_objects:
+
+                    x1, y1, x2, y2 , a = obj.bbox
+
+                    if obj.class_id == 3:
+                        if (y2-y1) > max_size_hs and (x2-x1) > max_size_ws:
+                            continue
+                        s_id = check_if_already_exists(obj, shutters_info, found_s_ids)
+                        if s_id != -1:
+                            found_s_ids.append(s_id)
+                            update_in_shutters_info(obj, shutters_info, s_id)
+                        else:
+                            add_in_shutters_info(obj, shutters_info)
+                
+                remove_from_shutters_info(found_s_ids, shutters_info)
+
+                ## display text
+                text = get_current_message_based_on_shutters_info(
+                    shutters_info, max_size_w, max_size_h
                 )
 
-                detected_objcets = cms_model.extract(frame)
+                vis_img = cms_model.visualize(cms_model.image.copy(), all_detected_objects)
+                cms_model.put_text_on_image(vis_img, text, 10, 10)
 
-                all_shutter_objects = [
-                    d for d in detected_objcets if d.class_id == 3
-                ]
-
+                cv2.imshow("disp", vis_img)
+                k = cv2.waitKey(1)
+                if k == ord_quit:
+                    exit()
+                elif k == ord_next:
+                    break
+                elif k == ord_skip:
+                    do_skip_idx = frame_idx + num_skip_frames
+                    print(f"skipping {num_skip_frames} frames")
+                else:
+                    do_skip_idx = -1
             else:
                 break
         
@@ -428,7 +662,7 @@ def make_parser():
     parser = argparse.ArgumentParser("onnxruntime cms demo")
     parser.add_argument(
         "--v_path", 
-        default="test_files/cms/Cms-1 Shutter Open.mp4", 
+        default="test_files/cms/Cms-2 Shutter Close.mp4", 
         type=str, 
         help="run on this particular video"
     )
@@ -442,13 +676,12 @@ def make_parser():
 
     parser.add_argument(
         "--vis", 
-        default=1, 
+        default=0, 
         type=int, 
         help="display info"
     )
    
     return parser
-
 
 if __name__ == "__main__":
     args = make_parser().parse_args()

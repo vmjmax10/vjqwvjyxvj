@@ -1,10 +1,17 @@
 {
+    "num_classes":4,
     "classes_and_colors":[
         ["person", [255, 0, 0]], 
         ["atm_machine", [0, 255, 0]],
         ["helmet", [0, 255, 0]],
         ["shutter", [255, 255, 0]]
-    ]
+    ],
+    "min_class_confidences_for_detection":{
+        "0":0.25,
+        "1":0.50,
+        "2":0.50,
+        "3":0.75
+    }
 }
 
 
