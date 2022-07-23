@@ -472,7 +472,7 @@ def get_current_message_based_on_shutters_info(shutters_info, max_size_w, max_si
             if len_heights < 5:
 
                 # print("came here", len_heights)
-                if s_info["num_active"] > 5 and len_heights:
+                if s_info["num_active"] > 10 and len_heights:
                     txt = "CLOSED" if s_info["last_n_y2"][-1] > max_size_h/2 else "OPEN"
                     msg = f"Shutter({s_id}) => {txt}" 
                     msgs.append(msg)
@@ -490,11 +490,6 @@ def get_current_message_based_on_shutters_info(shutters_info, max_size_w, max_si
 
             min_y2_index = s_last_n_y2.index(min_last_y2)
             max_y2_index = s_last_n_y2.index(max_last_y2)
-
-            max_h = max_last_y2 - s_info["min_y1"]
-            min_h = min_last_y2 - s_info["min_y1"]
-
-            # print(s_info["ideal_frames"], s_info["last_n_y2"], s_info["min_y1"], min_last_y2,  max_last_y2)
 
             ## IDLE STAGE
             if s_info["ideal_frames"] > 4:
@@ -515,7 +510,7 @@ def get_current_message_based_on_shutters_info(shutters_info, max_size_w, max_si
                     elif percentage_open > 25:
                         msg = f"Shutter({s_id}) => OPEN ({str(percentage_open)[:4]}%)"
                     elif percentage_open > 15:
-                        msg = f"Shutter({s_id}) => Analyzing OPENING ({str(percentage_open)[:4]}%)"
+                        msg = f"Shutter({s_id}) => OPENING ({str(percentage_open)[:4]}%)"
                     else:
                         msg = f"Shutter({s_id}) => Analyzing"
 
