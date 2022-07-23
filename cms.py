@@ -1,5 +1,6 @@
 ## Standard library imports
 import argparse
+from contextlib import closing
 import json
 import os
 import time
@@ -11,7 +12,7 @@ import numpy as np
 import onnxruntime
 
 NEXT_S_ID = 0
-MISS_THRESH = 3
+MISS_THRESH = 10
 
 class DetectedObject(object):
     def __init__(
@@ -390,67 +391,6 @@ def get_iou(query_rect, available_rects):
     return max_iou
 
 # ## 
-def add_in_shutters_info(obj, shutters_info):
-    global NEXT_S_ID
-    if len(shutters_info) == 0:
-        NEXT_S_ID = 0
-    
-    NEXT_S_ID += 1
-
-    s_id = NEXT_S_ID
-    shutters_info[s_id] = {
-        "miss_thresh":MISS_THRESH,
-        "last_n_locations":[obj.bbox for _ in range(MISS_THRESH)],
-        "last_n_heights":[[obj.bbox[1], obj.bbox[3], obj.bbox[3]-obj.bbox[1]]],
-        "closing_or_opening_msg":"....",
-        "s_height_and_y2":[obj.bbox[3]-obj.bbox[1], obj.bbox[3]],
-        "is_opening":None,
-        "_y1":obj.bbox[1], 
-        "_y2":obj.bbox[3],
-        "max_y2":obj.bbox[3]
-    }
-
-def update_in_shutters_info(obj, shutters_info, s_id):
-
-    s_info = shutters_info[s_id]
-
-    s_info["miss_thresh"] = MISS_THRESH
-    bbox = obj.bbox
-
-    ## update _y1, _y2 --> y1 is top of shutter which is fixed entity
-    s_info["_y1"] = min(s_info["_y1"], bbox[1])
-    s_info["_y2"] = bbox[3]
-    s_info["max_y2"] = max(s_info["max_y2"], bbox[3])
-    
-    last_s_height = s_info["s_height_and_y2"][1] - s_info["_y1"]
-    cur_s_height = bbox[3] - s_info["_y1"]
-
-    if last_s_height > cur_s_height + 3:
-        msg = "OPENING"
-        s_info["is_opening"] = True
-    elif last_s_height + 3 < cur_s_height:
-        msg = "CLOSING"
-        s_info["is_opening"] = False
-    else:
-        msg = "...."
-
-    s_info["closing_or_opening_msg"] = msg
-
-    s_info["s_height_and_y2"] = [cur_s_height, bbox[3]]
-    
-    s_info["last_n_locations"] = shutters_info[s_id]["last_n_locations"][1:] + [
-        bbox
-    ]
-    
-    s_info["last_n_heights"] = [
-        [
-            min(s_info["_y1"], lnh[0]),
-            lnh[1],
-            lnh[1] - min(s_info["_y1"], lnh[0])
-        ]
-        for lnh in s_info["last_n_heights"]
-    ][-9:]
-    s_info["last_n_heights"] += [[s_info["_y1"], s_info["_y2"], s_info["_y2"]-s_info["_y1"]]]
 
 def check_if_already_exists(obj, shutters_info, found_s_ids, min_iou_thresh=0.15):
     max_idx, max_iou = -1, min_iou_thresh
@@ -463,14 +403,57 @@ def check_if_already_exists(obj, shutters_info, found_s_ids, min_iou_thresh=0.15
             max_idx = s_id
     return max_idx
 
+def add_in_shutters_info(obj, shutters_info):
+    global NEXT_S_ID
+    if len(shutters_info) == 0:
+        NEXT_S_ID = 0
+    
+    NEXT_S_ID += 1
+
+    s_id = NEXT_S_ID
+    shutters_info[s_id] = {
+        "miss_thresh":MISS_THRESH,
+        "last_n_locations":[obj.bbox for _ in range(MISS_THRESH)],
+        "last_n_y2":[obj.bbox[3]],
+        "min_y1":obj.bbox[1], 
+        "max_y2":obj.bbox[3],
+        "ideal_frames":0,
+        "num_active":0,
+        "_opening":False
+    }
+    return s_id
+
+def update_in_shutters_info(obj, shutters_info, s_id):
+
+    s_info = shutters_info[s_id]
+
+    s_info["miss_thresh"] = MISS_THRESH
+    bbox = obj.bbox
+
+    s_info["num_active"] += 1
+
+    ## IGNORE UPDATES UNTILL SOME MOVEMENT
+    if s_info["last_n_y2"] and abs(bbox[3]-s_info["last_n_y2"][-1]) > 5:
+        s_info["last_n_y2"] = s_info["last_n_y2"][-5:] + [bbox[3]]
+        s_info["ideal_frames"] = 0
+    else:
+        s_info["ideal_frames"] += 1
+
+    ## update _y1, _y2 --> y1 is top of shutter which is fixed entity
+    s_info["min_y1"] = min(s_info["min_y1"], bbox[1])
+    s_info["max_y2"] = max(s_info["max_y2"], bbox[3])
+ 
+    s_info["last_n_locations"] = s_info["last_n_locations"][1:] + [bbox]
+  
 def remove_from_shutters_info(found_s_ids, shutters_info):
+
     for s_id in list(shutters_info.keys()):
         if s_id not in found_s_ids:
             shutters_info[s_id]["miss_thresh"] -= 1
             if shutters_info[s_id]["miss_thresh"] < 0:
                 del shutters_info[s_id]
             else:
-                shutters_info[s_id]["last_n_heights"] = []
+                shutters_info[s_id]["num_active"] = 0
 
 def get_current_message_based_on_shutters_info(shutters_info, max_size_w, max_size_h):
     
@@ -480,45 +463,72 @@ def get_current_message_based_on_shutters_info(shutters_info, max_size_w, max_si
         msg = "SHUTTERS OPEN"
     else:
         msgs = []
-        for s_id, s_info in shutters_info.items():
+        for s_id in list(shutters_info.keys()):
 
-            msg  = ""
-            len_heights = len(s_info["last_n_heights"])
+            s_info = shutters_info[s_id]
 
-            if len_heights > 3:
-                
-                s_heights = [d[-1] for d in s_info["last_n_heights"]]
-                min_h = min(s_heights)
-                max_h = max(s_heights)
+            len_heights = len(s_info["last_n_y2"])
 
-                if max_h - min_h < max_h*0.05:
-                    
-                    if s_info["is_opening"]:
-                        max_s_height = s_info["max_y2"] - s_info["_y1"]
-                        cur_s_height =  s_info["s_height_and_y2"][0]
+            if len_heights < 5:
 
-                        percentage_open = 100 - round((cur_s_height/max_s_height)*100, 2)
-                        if percentage_open > 90:
-                            msg = f"Shutter({s_id}) => OPEN"
-                            print(f"Shutter({s_id}) => OPEN")
-                            # cv2.waitKey(5000)
-                        else:
-                            msg = f"Shutter({s_id}) => OPEN ({percentage_open}%)"
-
-                    elif s_info["is_opening"] is not None:
-                        msg = f"Shutter({s_id}) => CLOSED"
-                        print(f"Shutter({s_id}) => CLOSED")
-                        # cv2.waitKey(5000)
-                   
-                ## case of OPENING/CLOSING
+                # print("came here", len_heights)
+                if s_info["num_active"] > 5 and len_heights:
+                    txt = "CLOSED" if s_info["last_n_y2"][-1] > max_size_h/2 else "OPEN"
+                    msg = f"Shutter({s_id}) => {txt}" 
+                    msgs.append(msg)
                 else:
-                    msg = s_info["closing_or_opening_msg"]
-                    msg = f"Shutter({s_id}) => {msg}"
+                    msg = f"Shutter({s_id}) => Analyzing" 
+                    msgs.append(msg)
+
+                continue
+
+            msg = ""
+
+            s_last_n_y2 = s_info["last_n_y2"]
+            min_last_y2 = min(s_last_n_y2)
+            max_last_y2 = max(s_last_n_y2)
+
+            min_y2_index = s_last_n_y2.index(min_last_y2)
+            max_y2_index = s_last_n_y2.index(max_last_y2)
+
+            max_h = max_last_y2 - s_info["min_y1"]
+            min_h = min_last_y2 - s_info["min_y1"]
+
+            # print(s_info["ideal_frames"], s_info["last_n_y2"], s_info["min_y1"], min_last_y2,  max_last_y2)
+
+            ## IDLE STAGE
+            if s_info["ideal_frames"] > 4:
+
+                if max_y2_index >= min_y2_index:
+                    msg = f"Shutter({s_id}) => CLOSED"
+                    del shutters_info[s_id]
+                    # print(f"Shutter({s_id}) => CLOSED")
+                else:
+                    max_s_height = s_info["max_y2"] - s_info["min_y1"]
+                    cur_s_height = s_last_n_y2[-1] - s_info["min_y1"]
+
+                    percentage_open = 100 - round((cur_s_height/max_s_height)*100, 2)
+                    if percentage_open > 90:
+                        msg = f"Shutter({s_id}) => OPEN"
+                        del shutters_info[s_id]
+                        # print(f"Shutter({s_id}) => OPEN")
+                    elif percentage_open > 25:
+                        msg = f"Shutter({s_id}) => OPEN ({str(percentage_open)[:4]}%)"
+                    elif percentage_open > 15:
+                        msg = f"Shutter({s_id}) => Analyzing OPENING ({str(percentage_open)[:4]}%)"
+                    else:
+                        msg = f"Shutter({s_id}) => Analyzing"
 
             else:
-                msg = f"Shutter({s_id}) => Analyzing...."
-            
-            msgs.append(msg)
+                if min_y2_index <= max_y2_index:
+                    s_info["_opening"] = False
+                    msg = f"Shutter({s_id}) => CLOSING"
+                else:
+                    msg = f"Shutter({s_id}) => OPENING"
+                    s_info["_opening"] = True
+
+            if msg:
+                msgs.append(msg)
 
         msg = ", ".join(msgs)
 
@@ -572,9 +582,6 @@ def cms_video_demo(args):
 
         print(f"\nStarting... session for ({v_idx}/{total_videos}) -> {video_path}")
 
-        global NEXT_S_ID
-        NEXT_S_ID = 1
-
         stream = cv2.VideoCapture(video_path)
         if not stream.isOpened():
             print(f"Error in video reading -> {video_path}")
@@ -625,7 +632,8 @@ def cms_video_demo(args):
                             found_s_ids.append(s_id)
                             update_in_shutters_info(obj, shutters_info, s_id)
                         else:
-                            add_in_shutters_info(obj, shutters_info)
+                            s_id = add_in_shutters_info(obj, shutters_info)
+                            found_s_ids.append(s_id)
                 
                 remove_from_shutters_info(found_s_ids, shutters_info)
 
