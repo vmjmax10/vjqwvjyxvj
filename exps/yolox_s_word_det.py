@@ -42,7 +42,7 @@ class Exp(MyExp):
         self.enable_mixup = False
 
         # --------------  training config --------------------- #
-        self.warmup_epochs = 10
+        self.warmup_epochs = 20
         self.max_epoch = 200
         self.warmup_lr = 0
         self.basic_lr_per_img = 0.01 / 64.0
@@ -56,7 +56,7 @@ class Exp(MyExp):
 
         self.weight_decay = 5e-4
         self.momentum = 0.9
-        self.print_interval = 260
+        self.print_interval = 290
         
         self.eval_interval = 5
         self.exp_name = os.path.split(os.path.realpath(__file__))[1].split(".")[0]
