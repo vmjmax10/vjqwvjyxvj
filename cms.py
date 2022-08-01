@@ -642,6 +642,7 @@ def cms_video_demo(args):
 
                 cv2.imshow("disp", vis_img)
                 k = cv2.waitKey(1)
+
                 if k == ord_quit:
                     exit()
                 elif k == ord_next:
@@ -672,7 +673,7 @@ def make_parser():
 
     parser.add_argument(
         "--v_dir", 
-        default="", 
+        default="test_files/cms", 
         type=str, 
         help="run on all video files in this particular directory"
     )
