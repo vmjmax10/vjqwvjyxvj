@@ -533,7 +533,9 @@ def get_current_message_based_on_shutters_info(shutters_info, max_size_w, max_si
 # ### CMS VIDEO DEMO FUNCTION
 def cms_video_demo(args):
     
-    if args.v_dir != "":
+    if args.v_path != "" and os.path.exists(args.v_path):
+        all_video_file_paths = [args.v_path]
+    elif args.v_dir != "":
         v_dir = args.v_dir
         try:
             all_video_file_paths = [
@@ -544,8 +546,6 @@ def cms_video_demo(args):
         except:
             print("Wrong dir given, please check")
             exit()
-    elif args.v_path != "" and os.path.exists(args.v_path):
-        all_video_file_paths = [args.v_path]
     else:
         print("please provide proper video info/path")
         exit()
@@ -561,7 +561,7 @@ def cms_video_demo(args):
         nms_thresh=0.10, 
         infer_size=640,
         cls_confidence=-1, ## special -1 value tells to use the per class confidnece
-        is_visualize_mode=bool(args.vis)
+        is_visualize_mode=False
     )
     print("Finished")
 
@@ -666,7 +666,7 @@ def make_parser():
     parser = argparse.ArgumentParser("onnxruntime cms demo")
     parser.add_argument(
         "--v_path", 
-        default="test_files/cms/Cms-2 Shutter Close.mp4", 
+        default="", 
         type=str, 
         help="run on this particular video"
     )
@@ -677,14 +677,7 @@ def make_parser():
         type=str, 
         help="run on all video files in this particular directory"
     )
-
-    parser.add_argument(
-        "--vis", 
-        default=0, 
-        type=int, 
-        help="display info"
-    )
-   
+    
     return parser
 
 if __name__ == "__main__":
