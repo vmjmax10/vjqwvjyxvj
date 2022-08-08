@@ -61,75 +61,75 @@ CLASS_NAMES_FOR_TRAIN_AP = {
     24: "Ntg"
 }
 
-COCO_CLASSES = [
-    "Not_Cat",
-    "Birman", 
-    "British_Shorthair", 
-    "Norwegian_Forest", 
-    "Persian", 
-    "Siamese", 
-    "Sphynx",
-    "Abyssinian",
-    "Scottish_Fold",
-    "Maine_Coon",
-    "Balinese",
-    "Russian_Blue",
-    "Savannah",
-    "Bengal",
-    "British_Longhair",
-    "Burmese",
-    "Dev",
-    "Munchkin",
-    "Oriental_Shorthair",
-    "Ragdoll",
-    "Sai",
-    "Toyger"
-]
+# COCO_CLASSES = [
+#     "Not_Cat",
+#     "Birman", 
+#     "British_Shorthair", 
+#     "Norwegian_Forest", 
+#     "Persian", 
+#     "Siamese", 
+#     "Sphynx",
+#     "Abyssinian",
+#     "Scottish_Fold",
+#     "Maine_Coon",
+#     "Balinese",
+#     "Russian_Blue",
+#     "Savannah",
+#     "Bengal",
+#     "British_Longhair",
+#     "Burmese",
+#     "Dev",
+#     "Munchkin",
+#     "Oriental_Shorthair",
+#     "Ragdoll",
+#     "Sai",
+#     "Toyger"
+# ]
 
 
-COCO_CLASSES = [
-    "ID_CARD",
-    "NID_NUMBER",
-    "FIRST_NAME",
-    "SUR_NAME",
-    "DOB",
-    "ISSUE_DATE",
-    "GENDER",
-    "PLACE_BIRTH",
-    "EXPIRY_DATE",
-    "PASSPORT_NO",
-    "OCCUPATION",
-    "VILLAGE_OF_ORIGIN",
-    "CARD_VALUES",
-    "ZIM_PASSPORT",
-    "ZIM_NR",
-    "ZIM_DL",
-    "GAPS"
-]
+# COCO_CLASSES = [
+#     "ID_CARD",
+#     "NID_NUMBER",
+#     "FIRST_NAME",
+#     "SUR_NAME",
+#     "DOB",
+#     "ISSUE_DATE",
+#     "GENDER",
+#     "PLACE_BIRTH",
+#     "EXPIRY_DATE",
+#     "PASSPORT_NO",
+#     "OCCUPATION",
+#     "VILLAGE_OF_ORIGIN",
+#     "CARD_VALUES",
+#     "ZIM_PASSPORT",
+#     "ZIM_NR",
+#     "ZIM_DL",
+#     "GAPS"
+# ]
 
 
-COCO_CLASSES = [
-    "word"
-]
+# COCO_CLASSES = [
+#     "word"
+# ]
 
-COCO_CLASSES = [
-    "person", 
-    "atm_machine", 
-    "helmet", 
-    "shutter"
-]
+# COCO_CLASSES = [
+#     "person", 
+#     "atm_machine", 
+#     "helmet", 
+#     "shutter"
+# ]
 
-COCO_CLASSES = [
-    "word", 
-    "sign", 
-    "th", 
-    "tc", 
-    "db"
-]
+# COCO_CLASSES = [
+#     "word", 
+#     "sign", 
+#     "th", 
+#     "tc", 
+#     "db"
+# ]
 
-CLASS_NAMES_FOR_TRAIN_AP = {
-    idx:d for idx, d in enumerate(COCO_CLASSES)
-}
+# CLASS_NAMES_FOR_TRAIN_AP = {
+#     idx:d for idx, d in enumerate(COCO_CLASSES)
+# }
 
 # COCO_CLASSES = [
 #     "CARD_TYPE",
