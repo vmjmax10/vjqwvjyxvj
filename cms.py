@@ -1,6 +1,5 @@
 ## Standard library imports
 import argparse
-from contextlib import closing
 import json
 import os
 import time
