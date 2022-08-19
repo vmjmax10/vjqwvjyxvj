@@ -10,8 +10,11 @@ import cv2
 import numpy as np
 import onnxruntime
 
-NEXT_S_ID = 0
-MISS_THRESH = 10
+## fastapi <local server specific imports>
+from fastapi import FastAPI
+from starlette.middleware.cors import CORSMiddleware
+from starlette.middleware.gzip import GZipMiddleware
+from starlette.requests import Request
 
 class DetectedObject(object):
     def __init__(
@@ -324,7 +327,108 @@ class CustomYolox_ONNX(object):
 
         return all_detected_objects
 
-# ##UTILS FUNCTIONS
+## DEFINE GLOBALS
+NEXT_S_ID = 0
+MISS_THRESH = 10
+
+try:
+    print("Model loading....", end="")
+    # Load model
+    CMS_MODEL = CustomYolox_ONNX(
+        model_path="all_models/yolox_s_cms.onnx",
+        cls_info_file_path="model_classes/cms.json",
+        nms_thresh=0.10, 
+        infer_size=640,
+        cls_confidence=-1, ## special -1 value tells to use the per class confidnece
+        is_visualize_mode=False
+    )
+    print("Finished")
+except Exception as e:
+    print(e)
+    CMS_MODEL = None
+
+
+def get_api_server(api_prefix="", debug_mode=False):
+
+    app = FastAPI(debug=debug_mode)
+
+    app.add_middleware(
+        CORSMiddleware, 
+        allow_origins=["*"],
+        allow_methods=["*"], 
+        allow_headers=["*"],
+        allow_credentials=True, 
+    )
+
+    app.add_middleware(GZipMiddleware, minimum_size=1000)
+
+    if api_prefix:
+        app_prefix = FastAPI(openapi_prefix=api_prefix)
+        app.mount(api_prefix, app_prefix)
+    else:
+        app_prefix = None
+
+    return app, app_prefix
+
+## set fastapi server
+app, app_prefix = get_api_server(api_prefix="/cms-server")
+
+@app_prefix.get("/isReady")
+async def is_ready():
+    return {"isReady": CMS_MODEL is not None}
+
+
+@app_prefix.post("/extractDataFromImages")
+async def extract_data_from_images(request: Request):
+    return api_call(await request.json(), None)
+
+
+def api_call(data, context):
+
+    # suc, message = validate_data_input(data)
+    # if not suc:
+    #     return error_in_function(message)
+
+    try:
+    # if 1:
+        t1 = time.time()
+        result = _extract_text_data_from_images(data)
+        # print(result)
+        result["totalExecutionTime"] = time.time() - t1
+    except Exception as e:
+        # print(e)
+        message = "Exception at the server, " \
+            "Report the issue to the admin, If it persists. "
+        message += f"Give this message: ({str(e)})"
+        
+        result = error_in_function(message)
+        
+    return result
+
+
+def validate_data_input(
+    data,
+    err_message="Server call with missing/wrong attributes, please try again",
+):
+
+    images = data.get("images", ())
+    if not ( 
+        isinstance(images, list)
+        and images
+        and all(
+            isinstance(image, (str, list))
+            for image in images 
+        )
+        and isinstance(data.get("documentInfo", ()), dict)
+        and isinstance(data.get("skipPerspectiveError", ()), bool)
+        and isinstance(data.get("applyPerspectiveCorrection", ()), bool)
+    ):  
+        return False, err_message
+
+    return True, "valid request"
+
+
+# ## UTILS FUNCTIONS
 
 def resize_to_desired_max_size_for_processing(img, max_size=1200):
 
@@ -552,24 +656,12 @@ def cms_video_demo(args):
     total_videos = len(all_video_file_paths)
     print(f"Total Video Files => {total_videos}")
 
-    print("Model loading....", end="")
-    # Load model
-    cms_model = CustomYolox_ONNX(
-        model_path="all_models/yolox_s_cms.onnx",
-        cls_info_file_path="model_classes/cms.json",
-        nms_thresh=0.10, 
-        infer_size=640,
-        cls_confidence=-1, ## special -1 value tells to use the per class confidnece
-        is_visualize_mode=False
-    )
-    print("Finished")
-
     # Display
     cv2.namedWindow("disp", cv2.WINDOW_NORMAL)
     ord_quit, ord_next, ord_skip = ord("q"), ord("n"), ord("s")
     num_skip_frames = 75
 
-    infer_size = cms_model.infer_size
+    infer_size = CMS_MODEL.infer_size
 
     ## run now
     for v_idx, video_path in enumerate(all_video_file_paths, start=1):
@@ -610,7 +702,7 @@ def cms_video_demo(args):
                 if frame_idx < do_skip_idx:
                     continue
 
-                all_detected_objects = cms_model.extract(frame)
+                all_detected_objects = CMS_MODEL.extract(frame)
                 
                 found_s_ids = []
                 ## add shutters info in session
@@ -636,8 +728,8 @@ def cms_video_demo(args):
                     shutters_info, max_size_w, max_size_h
                 )
 
-                vis_img = cms_model.visualize(cms_model.image.copy(), all_detected_objects)
-                cms_model.put_text_on_image(vis_img, text, 10, 10)
+                vis_img = CMS_MODEL.visualize(CMS_MODEL.image.copy(), all_detected_objects)
+                CMS_MODEL.put_text_on_image(vis_img, text, 10, 10)
 
                 cv2.imshow("disp", vis_img)
                 k = cv2.waitKey(1)
