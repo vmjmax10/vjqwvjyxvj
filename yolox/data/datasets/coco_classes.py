@@ -162,3 +162,35 @@ CLASS_NAMES_FOR_TRAIN_AP = {
 # COCO_CLASSES = [d[0] for d in _COCO_CLASSES_AND_COLORS]
 
 
+COCO_CLASSES = [
+    "CARD_TYPE",
+    "PAN_NUMBER",
+    "AADHAR_NUMBER",
+    "NAME ",
+    "FATHER_NAME ",
+    "DOB ",
+    "GENDER",
+    "SIGNATURE",
+    "MOTHER_NAME",
+    "MOBILE_NO",
+    "PASSPORT_NO",
+    "PLACE_OF_BIRTH",
+    "DATE_OF_EXPIRY",
+    "DATE_OF_ISSUE",
+    "NATIONALITY",
+    "SURNAME",
+    "TYPE",
+    "COUNTRY_CODE",
+    "PLACE_OF_ISSUE",
+    "PAN CARD",
+    "AADHAR CARD",
+    "DRIVING LICENSE",
+    "PHOTO",
+    "FACE",
+    "PASSPORT",
+    "DL_NUMBER"
+]
+
+CLASS_NAMES_FOR_TRAIN_AP = {
+    idx:d for idx, d in enumerate(COCO_CLASSES)
+}
