@@ -172,6 +172,7 @@ COCO_CLASSES = [
     "GENDER",
     "SIGNATURE",
     "MOTHER_NAME",
+    "DL_NUMBER",
     "MOBILE_NO",
     "PASSPORT_NO",
     "PLACE_OF_BIRTH",
@@ -187,8 +188,7 @@ COCO_CLASSES = [
     "DRIVING LICENSE",
     "PHOTO",
     "FACE",
-    "PASSPORT",
-    "DL_NUMBER"
+    "PASSPORT"
 ]
 
 CLASS_NAMES_FOR_TRAIN_AP = {
