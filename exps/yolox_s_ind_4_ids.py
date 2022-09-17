@@ -11,7 +11,7 @@ class Exp(MyExp):
         super(Exp, self).__init__()
         
         # ---------------- model config ---------------- #
-        self.num_classes = 27
+        self.num_classes = 26
         self.depth = 0.33
         self.width = 0.50
 
