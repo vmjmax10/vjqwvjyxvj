@@ -131,29 +131,29 @@ CLASS_NAMES_FOR_TRAIN_AP = {
 #     idx:d for idx, d in enumerate(COCO_CLASSES)
 # }
 
-# COCO_CLASSES = [
-#     "CARD_TYPE",
-#     "firstName",
-#     "lastName",
-#     "dateOfBirth", 
-#     "placeOfBirth",
-#     "village",
-#     "district",
-#     "chief",
-#     "registrationDate",
-#     "nrcNumber",
-#     "NR_FRONT",
-#     "NR_BACK",
-#     "idCardNumber",
-#     "gender",
-#     "dateOfIssue", 
-#     "dateOfExpiry", 
-#     "placeOfIssue", 
-#     "DRIVING_LICENSE",
-#     "VOTER_CARD",
-#     "PASSPORT",  
-#     "VISA",
-# ]
+COCO_CLASSES = [
+    "CARD_TYPE",
+    "firstName",
+    "lastName",
+    "dateOfBirth", 
+    "placeOfBirth",
+    "village",
+    "district",
+    "chief",
+    "registrationDate",
+    "nrcNumber",
+    "NR_FRONT",
+    "NR_BACK",
+    "idCardNumber",
+    "gender",
+    "dateOfIssue", 
+    "dateOfExpiry", 
+    "placeOfIssue", 
+    "DRIVING_LICENSE",
+    "VOTER_CARD",
+    "PASSPORT",  
+    "VISA",
+]
 
 # CLASS_NAMES_FOR_TRAIN_AP = {
 #     idx:d for idx, d in enumerate(COCO_CLASSES)
@@ -162,33 +162,33 @@ CLASS_NAMES_FOR_TRAIN_AP = {
 # COCO_CLASSES = [d[0] for d in _COCO_CLASSES_AND_COLORS]
 
 
-COCO_CLASSES = [
-    "CARD_TYPE",
-    "PAN_NUMBER",
-    "AADHAR_NUMBER",
-    "NAME ",
-    "FATHER_NAME ",
-    "DOB ",
-    "GENDER",
-    "SIGNATURE",
-    "PASSPORT",
-    "DL_NUMBER",
-    "MOBILE_NO",
-    "PASSPORT_NO",
-    "PLACE_OF_BIRTH",
-    "DATE_OF_EXPIRY",
-    "DATE_OF_ISSUE",
-    "NATIONALITY",
-    "SURNAME",
-    "TYPE",
-    "COUNTRY_CODE",
-    "PLACE_OF_ISSUE",
-    "PAN CARD",
-    "AADHAR CARD",
-    "DRIVING LICENSE",
-    "PHOTO",
-    "FACE"
-]
+# COCO_CLASSES = [
+#     "CARD_TYPE",
+#     "PAN_NUMBER",
+#     "AADHAR_NUMBER",
+#     "NAME ",
+#     "FATHER_NAME ",
+#     "DOB ",
+#     "GENDER",
+#     "SIGNATURE",
+#     "PASSPORT",
+#     "DL_NUMBER",
+#     "MOBILE_NO",
+#     "PASSPORT_NO",
+#     "PLACE_OF_BIRTH",
+#     "DATE_OF_EXPIRY",
+#     "DATE_OF_ISSUE",
+#     "NATIONALITY",
+#     "SURNAME",
+#     "TYPE",
+#     "COUNTRY_CODE",
+#     "PLACE_OF_ISSUE",
+#     "PAN CARD",
+#     "AADHAR CARD",
+#     "DRIVING LICENSE",
+#     "PHOTO",
+#     "FACE"
+# ]
 
 CLASS_NAMES_FOR_TRAIN_AP = {
     idx:d for idx, d in enumerate(COCO_CLASSES)

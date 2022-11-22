@@ -21,12 +21,12 @@ class Exp(MyExp):
         self.input_size = (640, 640)  # (height, width)
         self.multiscale_range = 4
         # self.random_size = (14, 26)
-        self.data_dir = "/content/vjqwvjyxvj/gdrive/MyDrive/DATASET/ZAMBIA_ID_CARD/YOLOX"
+        self.data_dir = "/content/vjqwvjyxvj/gdrive/MyDrive/INNOKRIT_AI/DATASET/ID_CARD_ZAMBIA"
         self.train_ann = "train_coco.json"
         self.val_ann = "val_coco.json"
         self.train_img_dir = "train"
         self.val_img_dir = "train"
-        self.output_dir = "/content/vjqwvjyxvj/gdrive/MyDrive/TRAINED_MODELS/ZAMBIA_ID_CARD"
+        self.output_dir = "/content/vjqwvjyxvj/gdrive/MyDrive/INNOKRIT_AI/TRAINED_MODELS/ID_CARD_ZAMBIA"
         
         # --------------- transform config ----------------- #
         self.mosaic_prob = 2.0
