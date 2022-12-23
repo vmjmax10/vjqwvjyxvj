@@ -1,8 +1,9 @@
 if 1:
     import onnx, onnxruntime, numpy as np, cv2, time
     infer_session = onnxruntime.InferenceSession(
-        "all_models/yolox_nano_vjs_dyn.onnx",
+        "all_models/yolox_s_layout_word_det_v3_sign.onnx",
         providers=[
+            # "TensorrtExecutionProvider"
             "CUDAExecutionProvider", 
             # "CPUExecutionProvider"
         ]
@@ -12,15 +13,19 @@ if 1:
 
     print(input_tensor_name, input_tensor.shape)
     
-    infer_size = 640
+    infer_size = 2048
 
     swap=(2, 0, 1)
 
     # print(img_s.shape)
-    num_samples = 4
+    num_samples = 15
+
+    img = cv2.imread("test.jpg")
 
     sample_images = [
-        np.random.randint(0, 256, size=(infer_size,infer_size, 3), dtype=np.uint8)
+        # img
+        np.ones((infer_size,infer_size, 3), dtype=np.uint8)*255
+        # np.random.randint(0, 256, size=(infer_size,infer_size, 3), dtype=np.uint8)
         for _ in range(num_samples)
     ]
 
@@ -39,19 +44,20 @@ if 1:
     output_a = {}
     st = time.time()
     for idx in range(num_samples):
+        st1 = time.time()
         output_a[idx] = infer_session.run(None, {input_tensor_name: img_batch[idx]})
+        print("TIME -> ", idx, time.time()-st1, "\n")
     tt = time.time()-st
-    print("TIME -> ", tt, "\n")
 
-    st = time.time()
-    output_b = infer_session.run(None, {input_tensor_name: np.concatenate(img_batch)})
-    dt = time.time()-st
+    # for _ in range(4):
+    #     st = time.time()
+    #     output_b = infer_session.run(None, {input_tensor_name: np.concatenate(img_batch)})
+    #     dt = time.time()-st
+    #     print("TIME BATCH -> ", dt)
 
-    print(output_b[0][num_samples-1].shape, output_a[num_samples-1][0][0].shape)
+    # print(output_b[0][num_samples-1].shape, output_a[num_samples-1][0][0].shape)
 
-    print("TIME BATCH -> ", dt, dt-tt)
-
-    print(np.array_equal(output_b[0][num_samples-1], output_a[num_samples-1][0][0]))
+    # print(np.array_equal(output_b[0][num_samples-1], output_a[num_samples-1][0][0]))
 
     exit()
 

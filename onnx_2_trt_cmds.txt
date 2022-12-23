@@ -1,0 +1,14 @@
+
+## DYNAMIC TEST :: BETA
+trtexec --onnx=yolox_nano_vjs.onnx --minShapes=image_batch:1x3x640x640 --optShapes=image_batch:1x3x640x640 --maxShapes=image_batch:1x3x640x640 --shapes=image_batch:1x3x640x640 --workspace=1G --buildOnly --saveEngine=yolox_nano_vjs.trt 
+
+trtexec --onnx=yolox_nano_vjs_dyn.onnx --minShapes=image_batch:1x3x640x640 --optShapes=image_batch:8x3x640x640 --maxShapes=image_batch:8x3x640x640 --shapes=image_batch:8x3x640x640 --workspace=10G --buildOnly --saveEngine=yolox_nano_vjs_dyn.trt 
+
+trtexec --onnx=yolox_s_layout_word_det_v3_sign.onnx --minShapes=image_batch:1x3x2048x2048 --optShapes=image_batch:1x3x2048x2048 --maxShapes=image_batch:1x3x2048x2048 --workspace=1G --buildOnly --saveEngine=yolox_s_layout_word_det_v3_sign.trt 
+
+
+
+###########################  STATIC ONES .....
+trtexec --onnx=yolox_s_layout_word_det_v3_sign.onnx --workspace=1G --buildOnly --saveEngine=yolox_s_layout_word_det_v3_sign.trt 
+
+trtexec --onnx=yolox_nano_vjs.onnx --workspace=1G --buildOnly --saveEngine=yolox_nano_vjs.trt 
