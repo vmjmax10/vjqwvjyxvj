@@ -31,8 +31,6 @@ class TrtModel:
         self.inputs, self.outputs, self.bindings, self.stream = self.allocate_buffers()
         self.context = self.engine.create_execution_context()
 
-                
-                
     @staticmethod
     def load_engine(trt_runtime, engine_path):
         trt.init_libnvinfer_plugins(None, "")             
@@ -63,7 +61,6 @@ class TrtModel:
         
         return inputs, outputs, bindings, stream
        
-            
     def __call__(self,x:np.ndarray, batch_size=1):
         
         x = x.astype(self.dtype)
@@ -77,9 +74,9 @@ class TrtModel:
         for out in self.outputs:
             cuda.memcpy_dtoh_async(out.host, out.device, self.stream) 
             
-        
         self.stream.synchronize()
         return [out.host.reshape(batch_size, -1) for out in self.outputs]
+
 
 if __name__ == "__main__":
  
