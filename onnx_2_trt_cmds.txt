@@ -12,3 +12,5 @@ trtexec --onnx=yolox_s_layout_word_det_v3_sign.onnx --minShapes=image_batch:1x3x
 trtexec --onnx=yolox_s_layout_word_det_v3_sign.onnx --workspace=1G --buildOnly --saveEngine=yolox_s_layout_word_det_v3_sign.trt 
 
 trtexec --onnx=yolox_nano_vjs.onnx --workspace=1G --buildOnly --saveEngine=yolox_nano_vjs.trt 
+
+trtexec --onnx=yolox_s_vjs.onnx --workspace=1G --buildOnly --saveEngine=yolox_s_vjs.trt 
