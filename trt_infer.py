@@ -5,7 +5,7 @@ import time
 
 import pycuda.driver as cuda
 import pycuda.autoinit
-
+import tensorrt as trt
 
 class HostDeviceMem(object):
     def __init__(self, host_mem, device_mem):
