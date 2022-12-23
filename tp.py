@@ -1,7 +1,7 @@
 if 1:
     import onnx, onnxruntime, numpy as np, cv2, time
     infer_session = onnxruntime.InferenceSession(
-        "all_models/yolox_s_layout_word_det_v3_sign.onnx",
+        "all_models/yolox_s_vjs.onnx",
         providers=[
             # "TensorrtExecutionProvider"
             "CUDAExecutionProvider", 
@@ -13,7 +13,7 @@ if 1:
 
     print(input_tensor_name, input_tensor.shape)
     
-    infer_size = 2048
+    infer_size = 640
 
     swap=(2, 0, 1)
 
@@ -23,8 +23,8 @@ if 1:
     img = cv2.imread("test.jpg")
 
     sample_images = [
-        # img
-        np.ones((infer_size,infer_size, 3), dtype=np.uint8)*255
+        img
+        # np.ones((infer_size,infer_size, 3), dtype=np.uint8)*255
         # np.random.randint(0, 256, size=(infer_size,infer_size, 3), dtype=np.uint8)
         for _ in range(num_samples)
     ]

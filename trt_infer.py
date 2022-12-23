@@ -89,7 +89,7 @@ if __name__ == "__main__":
     swap=(2, 0, 1)
     num_samples = 15
     img = cv2.imread("test.jpg")
-    img = np.ones((infer_size, infer_size, 3), dtype=np.uint8)*255
+    # img = np.ones((infer_size, infer_size, 3), dtype=np.uint8)*255
     sample_images = [
         img
         # np.ones((infer_size,infer_size, 3), dtype=np.uint8)
@@ -104,7 +104,7 @@ if __name__ == "__main__":
         img_s = resized_img[None, :, :, :]
         img_batch.append(img_s)
 
-    trt_engine_path = "all_models/yolox_s_layout_word_det_v3_sign.trt"
+    trt_engine_path = "all_models/yolox_s_vjs.trt"
     model = TrtModel(trt_engine_path, max_batch_size=1)
 
     for idx in range(num_samples):
