@@ -103,7 +103,16 @@ def main():
         dummy_input = torch.randn(1, 3, exp.test_size[0], exp.test_size[1])
 
     dynamic_axes_dict = {
-        "image_batch": [0, 2, 3], "output": [0, 1, 2]
+        "image_batch": [
+            0, 
+            2, 
+            3
+        ], 
+        "output": [
+            0, 
+            1, 
+            2
+        ]
     }
 
     torch.onnx._export(
@@ -166,61 +175,12 @@ def main():
 
 
 if __name__ == "__main__":
-    # main()
+    main()
 
     ## 
-    import onnx, onnxruntime, numpy as np, cv2, time
-    infer_session = onnxruntime.InferenceSession("all_models/yolox_nano_vjs.onnx")
-    input_tensor = infer_session.get_inputs()[0]
-    input_tensor_name = input_tensor.name
-
-    # print(input_tensor_name, input_tensor.shape)
-    
-    infer_size = 2048
-
-    swap=(2, 0, 1)
-
-    # print(img_s.shape)
-    num_samples = 8
-
-    sample_images = [
-        np.random.randint(0, 256, size=(infer_size,infer_size, 3),dtype=np.uint8)
-        for _ in range(num_samples)
-    ]
-
-    img_batch = []
-    for idx in range(num_samples):
-        resized_img = cv2.resize(
-            sample_images[idx],
-            (infer_size, infer_size),
-            interpolation=cv2.INTER_AREA
-        )
-        resized_img = resized_img.transpose(swap)
-        resized_img = np.ascontiguousarray(resized_img, dtype=np.float32)
-        img_s = resized_img[None, :, :, :]
-        img_batch.append(img_s)
-    
-    output_a = {}
-    st = time.time()
-    for idx in range(num_samples):
-        output_a[idx] = infer_session.run(None, {input_tensor_name: img_batch[idx]})
-    tt = time.time()-st
-    print("TIME -> ", tt, "\n")
-
-    st = time.time()
-    output_b = infer_session.run(None, {input_tensor_name: np.concatenate(img_batch)})
-    dt = time.time()-st
-
-    # print(output_b[0][5].shape, output_a[5][0][0].shape)
-
-    print("TIME BATCH -> ", dt, dt-tt)
-
-    print(np.array_equal(output_b[0][num_samples-1], output_a[num_samples-1][0][0]))
-
-
 
 ## ONNX ONLY
-# python export2tfsaved.py -f exps/yolox_nano_vjs.py -c all_models/yolox_nano_vjs.pth --output_onnx_path all_models/yolox_nano_vjs.onnx --t_size 640
+# python export2tfsaved.py -f exps/yolox_nano_vjs.py -c all_models/yolox_nano_vjs.pth --output_onnx_path all_models/yolox_nano_vjs_dyn.onnx --t_size 640
 
 
 

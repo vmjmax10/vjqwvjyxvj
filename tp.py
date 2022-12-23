@@ -1,3 +1,60 @@
+if 1:
+    import onnx, onnxruntime, numpy as np, cv2, time
+    infer_session = onnxruntime.InferenceSession(
+        "all_models/yolox_nano_vjs_dyn.onnx",
+        providers=[
+            "CUDAExecutionProvider", 
+            # "CPUExecutionProvider"
+        ]
+    )
+    input_tensor = infer_session.get_inputs()[0]
+    input_tensor_name = input_tensor.name
+
+    print(input_tensor_name, input_tensor.shape)
+    
+    infer_size = 640
+
+    swap=(2, 0, 1)
+
+    # print(img_s.shape)
+    num_samples = 4
+
+    sample_images = [
+        np.random.randint(0, 256, size=(infer_size,infer_size, 3), dtype=np.uint8)
+        for _ in range(num_samples)
+    ]
+
+    img_batch = []
+    for idx in range(num_samples):
+        resized_img = cv2.resize(
+            sample_images[idx],
+            (infer_size, infer_size),
+            interpolation=cv2.INTER_AREA
+        )
+        resized_img = resized_img.transpose(swap)
+        resized_img = np.ascontiguousarray(resized_img, dtype=np.float32)
+        img_s = resized_img[None, :, :, :]
+        img_batch.append(img_s)
+    
+    output_a = {}
+    st = time.time()
+    for idx in range(num_samples):
+        output_a[idx] = infer_session.run(None, {input_tensor_name: img_batch[idx]})
+    tt = time.time()-st
+    print("TIME -> ", tt, "\n")
+
+    st = time.time()
+    output_b = infer_session.run(None, {input_tensor_name: np.concatenate(img_batch)})
+    dt = time.time()-st
+
+    print(output_b[0][num_samples-1].shape, output_a[num_samples-1][0][0].shape)
+
+    print("TIME BATCH -> ", dt, dt-tt)
+
+    print(np.array_equal(output_b[0][num_samples-1], output_a[num_samples-1][0][0]))
+
+    exit()
+
 # from yolox.core import Trainer, launch
 # from yolox.exp import get_exp
 # from yolox.utils import configure_nccl, configure_omp, get_num_devices
