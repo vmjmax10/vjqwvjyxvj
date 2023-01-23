@@ -190,6 +190,35 @@ COCO_CLASSES = [
 #     "FACE"
 # ]
 
+
+COCO_CLASSES = [
+    "CARD_TYPE",
+    "name",
+    "dob",
+    "gender",
+    "placeOfBirth",
+    "placeOfIssue",
+    "dateOfIssue",
+    "dateOfExpiry",
+    "serialNumber",
+    "surName",
+    "idCardNumber",
+    "passportType",
+    "nationality",
+    "subIDNo",
+    "district",
+    "division",
+    "location",
+    "subLocation",
+    "countryOfResidence",
+    "perosnalNo",
+    "NID_FRONT",
+    "NID_BACK",
+    "PASSPORT",
+    "DL",
+    "FACE"
+]
+
 CLASS_NAMES_FOR_TRAIN_AP = {
     idx:d for idx, d in enumerate(COCO_CLASSES)
 }
