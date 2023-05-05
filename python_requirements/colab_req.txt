@@ -72,4 +72,4 @@ wrapt==1.12.1
 zipp==3.5.0
 pytz==2022.1
 
-## !pip install torch==1.8.0+cu101 torchvision==0.9.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html
+## !pip install torch==1.13.0+cu116 torchvision==0.14.0+cu116 torchaudio==0.13.0 --extra-index-url https://download.pytorch.org/whl/cu116

@@ -19,6 +19,8 @@ class Exp(MyExp):
 
         self.base_gdrive_dir = "/content/vjqwvjyxvj/gdrive/MyDrive/INNOKRIT_AI"
 
+        self.base_gdrive_dir = "../INNOKRIT_AI"
+
         self.data_num_workers = 4
         self.input_size = (2048, 2048)  # (height, width)
         self.multiscale_range = 2

@@ -217,3 +217,5 @@ if __name__ == "__main__":
 
 ## LAYOUT & WORD det - S
 # python export2tfsaved.py -f exps/yolox_s_word_det.py -c all_models/yolox_s_lay_word_det.pth --output_onnx_path all_models/yolox_s_lay_word_det.onnx --t_size 2048
+
+# python export2tfsaved.py -f exps/yolox_s_lwdet.py -c all_models/yolox_s_lwdet.pth --output_onnx_path all_models/yolox_s_lwdet.onnx --t_size 2048

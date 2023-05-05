@@ -3,6 +3,7 @@ __pycache__
 pyenv
 all_models
 test_files
+content
 
 *.pkl
 *.pdf

@@ -1,4 +1,24 @@
-if 1:
+
+
+import torch
+torch.backends.cuda.matmul.allow_tf32 = False
+torch.backends.cudnn.benchmark = True
+torch.backends.cudnn.deterministic = False
+torch.backends.cudnn.allow_tf32 = True
+data = torch.randn([2, 12, 1024, 1024], dtype=torch.half, device='cuda', requires_grad=True)
+net = torch.nn.Conv2d(12, 32, kernel_size=[3, 3], padding=[1, 1], stride=[1, 1], dilation=[1, 1], groups=1)
+net = net.cuda().half()
+out = net(data)
+out.backward(torch.randn_like(out))
+torch.cuda.synchronize()
+
+exit()
+
+
+
+
+
+if 0:
     import onnx, onnxruntime, numpy as np, cv2, time
     infer_session = onnxruntime.InferenceSession(
         "all_models/yolox_s_vjs.onnx",
@@ -84,6 +104,8 @@ if 1:
 #     ).astype(dtype)
 #     cv2.cvtColor(img_hsv, cv2.COLOR_HSV2BGR, dst=img)  # no return needed
 
+
+# python train.py -f "exps/yolox_s_lwdet.py" -c "../INNOKRIT_AI/TRAINED_MODELS/yolox_s.pth" -d 1 -b 2 -o --fp16 --cache 
 
 # img = cv2.imread("1.jpg")
 

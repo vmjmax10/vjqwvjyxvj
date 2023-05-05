@@ -77,7 +77,7 @@ class COCODataset(Dataset):
         
         # cache_file = self.data_dir + "/img_resized_cache_" + self.name + ".array"
 
-        cache_file = f"/content/img_resized_cache__{self.json_file.split('.json')[0]}_{self.name}.array"
+        cache_file = f"./content/img_resized_cache__{self.json_file.split('.json')[0]}_{self.name}.array"
 
         if not os.path.exists(cache_file):
             logger.info(
