@@ -432,3 +432,4 @@ if 1:
     print(f"Time taken for {len(img_list)} => ", time.time()-st)
 
 
+# mo --input_model all_models/yolox_s_lwdet.onnx --output_dir all_models/yolox_s_lwdet
