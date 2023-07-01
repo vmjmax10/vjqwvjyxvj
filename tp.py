@@ -105,8 +105,6 @@ if 0:
 #     cv2.cvtColor(img_hsv, cv2.COLOR_HSV2BGR, dst=img)  # no return needed
 
 
-# python train.py -f "exps/yolox_s_lwdet.py" -c "../INNOKRIT_AI/TRAINED_MODELS/yolox_s.pth" -d 1 -b 2 -o --fp16 --cache 
-
 # img = cv2.imread("1.jpg")
 
 # # img1 = img.copy()
@@ -431,5 +429,9 @@ if 1:
 
     print(f"Time taken for {len(img_list)} => ", time.time()-st)
 
+
+# python train.py -f "exps/yolox_s_lwdet.py" -c "../INNOKRIT_AI/TRAINED_MODELS/latest_ckpt.pth" -d 1 -b 2 -o --fp16 --cache 
+
+# python export2tfsaved.py -f exps/yolox_s_lwdet.py -c all_models/yolox_s_lwdet.pth --output_onnx_path all_models/yolox_s_lwdet.onnx --t_size 2048
 
 # mo --input_model all_models/yolox_s_lwdet.onnx --output_dir all_models/yolox_s_lwdet

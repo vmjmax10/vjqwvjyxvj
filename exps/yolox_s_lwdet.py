@@ -23,14 +23,14 @@ class Exp(MyExp):
 
         self.data_num_workers = 4
         self.input_size = (2048, 2048)  # (height, width)
-        self.multiscale_range = 2
+        self.multiscale_range = 0
         # self.random_size = (14, 26)
-        self.data_dir = f"{self.base_gdrive_dir}/DATASET/LAYOUT_WORD_DS/gcv_ex"
+        self.data_dir = f"{self.base_gdrive_dir}/DATASET/LAYOUT_WORD_DS/gcv"
         self.train_ann = "train_coco.json"
         self.val_ann = "val_coco.json"
         self.train_img_dir = "train"
         self.val_img_dir = "train"
-        self.output_dir = f"{self.base_gdrive_dir}/TRAINED_MODELS/LAYOUT_WORD_DS/gcv_ex"
+        self.output_dir = f"{self.base_gdrive_dir}/TRAINED_MODELS/LAYOUT_WORD_DS/gcv"
         
         # --------------- transform config ----------------- #
         self.mosaic_prob = 2.0
@@ -46,23 +46,23 @@ class Exp(MyExp):
         self.enable_mixup = False
 
         # --------------  training config --------------------- #
-        self.warmup_epochs = 30
-        self.max_epoch = 300
+        self.warmup_epochs = 50
+        self.max_epoch = 500
         self.warmup_lr = 0
-        self.basic_lr_per_img = 0.01 / 32.0
+        self.basic_lr_per_img = 0.01 / 64.0
         self.scheduler = "yoloxwarmcos"
-        self.no_aug_epochs = 300
+        self.no_aug_epochs = 500
         self.min_lr_ratio = 0.05
         self.ema = True
         self.max_labels_tt = 100
         self.max_labels_mosaicd = 100
         self.flip_image = False
 
-        self.weight_decay = 5e-4
+        self.weight_decay = 5e-5
         self.momentum = 0.9
-        self.print_interval = 10
+        self.print_interval = 106
         
-        self.eval_interval = 20
+        self.eval_interval = 5
         self.exp_name = os.path.split(os.path.realpath(__file__))[1].split(".")[0]
         # self.exp_name = "yolox_s_vjs_fp16"
 
